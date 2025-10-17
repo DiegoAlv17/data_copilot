@@ -2,15 +2,12 @@
   "name": "mcp-postgres-analytics",
   "version": "1.0.0",
   "description": "Implementación completa de MCP PostgreSQL con Analytics y Gemini AI",
-  "main": "server.js",
+  "main": "src/server/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "mcp:start": "node server.js",
-    "analytics": "start frontend-analytics.html",
-    "client": "start client-mcp-direct.html",
-    "proxy": "node mcp-websocket-proxy.js",
-    "server": "node mcp-postgres-server.js"
+    "start": "node src/server/server.js",
+    "dev": "node src/server/server.js",
+    "mcp:start": "node src/server/mcp-postgres-server.js",
+    "server": "node src/server/server.js"
   },
   "keywords": [
     "mcp",

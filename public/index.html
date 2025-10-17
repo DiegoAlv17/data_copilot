@@ -31,10 +31,36 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
         .header h1 {
             color: white;
             font-size: 1.5rem;
             font-weight: 600;
+        }
+
+        .toggle-sidebar-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .toggle-sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
 
         .status-indicator {
@@ -61,12 +87,175 @@
         .main-container {
             flex: 1;
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 260px 1fr 2fr;
             gap: 1rem;
             padding: 1rem;
-            max-width: 1400px;
+            max-width: 1800px;
             margin: 0 auto;
             width: 100%;
+            transition: grid-template-columns 0.3s ease;
+        }
+
+        .main-container.sidebar-hidden {
+            grid-template-columns: 0 1fr 2fr;
+        }
+
+        .sidebar {
+            background: rgba(17, 24, 39, 0.95);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .main-container.sidebar-hidden .sidebar {
+            width: 0;
+            min-width: 0;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sidebar-header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            color: #f9fafb;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .new-chat-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            width: 100%;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .new-chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .conversations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .conversation-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .conversation-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(4px);
+        }
+
+        .conversation-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .conversation-title {
+            color: #f9fafb;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .conversation-preview {
+            color: #9ca3af;
+            font-size: 0.75rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .conversation-time {
+            color: #6b7280;
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+        }
+
+        .delete-conversation-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            color: #fca5a5;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .conversation-item:hover .delete-conversation-btn {
+            opacity: 1;
+        }
+
+        .delete-conversation-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+            color: white;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.7);
         }
 
         .chat-panel {
@@ -113,6 +302,95 @@
             background: #f0fdf4;
             font-size: 0.9rem;
             font-style: italic;
+        }
+
+        /* Indicador de herramientas MCP */
+        .mcp-tools-indicator {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .mcp-tools-header {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mcp-tool-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .mcp-tool-name {
+            font-weight: 500;
+        }
+
+        .mcp-tool-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .mcp-tool-status.success {
+            background: #10b981;
+        }
+
+        .mcp-tool-status.cache {
+            background: #f59e0b;
+        }
+
+        .mcp-tool-status.cache-expired {
+            background: #ef4444;
+        }
+
+        .mcp-tool-status.emergency {
+            background: #dc2626;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .schema-source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .schema-source-badge.mcp {
+            background: #10b981;
+            color: white;
+        }
+
+        .schema-source-badge.cache {
+            background: #f59e0b;
+            color: white;
         }
 
         .input-area {
@@ -217,39 +495,6 @@
             font-style: italic;
         }
 
-        .examples-section {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .examples-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.5rem;
-        }
-
-        .example-queries {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .example-query {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            padding: 0.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-
-        .example-query:hover {
-            background: #f3f4f6;
-        }
-
         .loading {
             display: inline-block;
             width: 20px;
@@ -296,6 +541,10 @@
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
+
+            .sidebar {
+                display: none;
+            }
             
             .header {
                 padding: 1rem;
@@ -309,7 +558,13 @@
 </head>
 <body>
     <div class="header">
-        <h1>🔗 Analytics MCP Dashboard</h1>
+        <div class="header-left">
+            <button class="toggle-sidebar-btn" id="toggle-sidebar-btn">
+                <span id="sidebar-icon">☰</span>
+                <span id="sidebar-text">Ocultar</span>
+            </button>
+            <h1>🔗 Analytics MCP Dashboard</h1>
+        </div>
         <div class="status-indicator">
             <div class="status-dot"></div>
             <span id="connection-status">Conectando...</span>
@@ -317,6 +572,19 @@
     </div>
 
     <div class="main-container">
+        <!-- Sidebar de Conversaciones -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">💬 Conversaciones</div>
+                <button class="new-chat-btn" id="new-chat-btn">
+                    ➕ Nueva Conversación
+                </button>
+            </div>
+            <div class="conversations-list" id="conversations-list">
+                <!-- Se llenará dinámicamente con JavaScript -->
+            </div>
+        </div>
+
         <!-- Panel de Chat y Consultas -->
         <div class="chat-panel">
             <div class="chat-header">
@@ -340,27 +608,6 @@
                 <button id="send-btn" class="send-btn">
                     Enviar
                 </button>
-            </div>
-
-            <div class="examples-section">
-                <div class="examples-title">📋 Consultas de Ejemplo:</div>
-                <div class="example-queries">
-                    <div class="example-query" data-query="Muestra los empleados por país">
-                        📊 Empleados por país
-                    </div>
-                    <div class="example-query" data-query="¿Cuáles son los productos más vendidos?">
-                        🏆 Productos más vendidos
-                    </div>
-                    <div class="example-query" data-query="Ventas por categoría de producto">
-                        📈 Ventas por categoría
-                    </div>
-                    <div class="example-query" data-query="Evolución de pedidos por mes">
-                        📅 Pedidos mensuales
-                    </div>
-                    <div class="example-query" data-query="Top 10 clientes con más pedidos">
-                        👥 Mejores clientes
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -393,9 +640,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="gemini-nl2sql.js"></script>
-    <script src="data-transformer.js"></script>
-    <script src="chart-engine.js"></script>
+    <script src="js/gemini-nl2sql.js"></script>
+    <script src="js/data-transformer.js"></script>
+    <script src="js/chart-engine.js"></script>
     <script>
         // Variables globales
         let mcpWebSocket = null;
@@ -404,12 +651,18 @@
         let currentChartType = 'bar';
         let pendingRequests = new Map(); // Para rastrear contexto de requests
 
+        // Variables de conversación
+        let conversations = [];
+        let currentConversationId = null;
+        let conversationMessages = []; // Mensajes de la conversación actual
+
         // Configuración
         const WEBSOCKET_URL = 'ws://localhost:3002';
         const GEMINI_API_KEY = 'AIzaSyCQJm1ieLoyhnpiy-wpAAdsKK43zQGvDhs';
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
+            loadConversations();
             initializeWebSocket();
             setupEventListeners();
             showSystemMessage('Inicializando conexión con MCP...');
@@ -426,14 +679,11 @@
                 }
             });
 
-            // Consultas de ejemplo
-            document.querySelectorAll('.example-query').forEach(button => {
-                button.addEventListener('click', function() {
-                    const query = this.dataset.query;
-                    document.getElementById('natural-input').value = query;
-                    handleSendQuery();
-                });
-            });
+            // Nueva conversación
+            document.getElementById('new-chat-btn').addEventListener('click', createNewConversation);
+
+            // Toggle sidebar
+            document.getElementById('toggle-sidebar-btn').addEventListener('click', toggleSidebar);
 
             // Selector de tipo de gráfico
             document.querySelectorAll('.chart-type-btn').forEach(button => {
@@ -487,6 +737,23 @@
             dot.style.background = isConnected ? '#4ade80' : '#ef4444';
         }
 
+        // Toggle sidebar
+        function toggleSidebar() {
+            const mainContainer = document.querySelector('.main-container');
+            const sidebarIcon = document.getElementById('sidebar-icon');
+            const sidebarText = document.getElementById('sidebar-text');
+            
+            mainContainer.classList.toggle('sidebar-hidden');
+            
+            if (mainContainer.classList.contains('sidebar-hidden')) {
+                sidebarIcon.textContent = '☰';
+                sidebarText.textContent = 'Mostrar';
+            } else {
+                sidebarIcon.textContent = '✕';
+                sidebarText.textContent = 'Ocultar';
+            }
+        }
+
         // Manejar envío de consulta
         async function handleSendQuery() {
             const input = document.getElementById('natural-input');
@@ -504,23 +771,40 @@
             input.value = '';
 
             try {
-                // Paso 1: Convertir lenguaje natural a SQL usando Gemini con schema optimizado
-                showSystemMessage('🔍 Verificando schema de la BD...');
-                const sqlQuery = await convertNaturalLanguageToSQL(query, mcpWebSocket);
+                // Paso 1: Convertir lenguaje natural a SQL usando Gemini con schema del MCP
+                showSystemMessage('🔍 Procesando consulta con Gemini...');
+                const result = await convertNaturalLanguageToSQL(query, mcpWebSocket);
                 
-                if (!sqlQuery) {
-                    throw new Error('No se pudo generar consulta SQL');
+                if (!result) {
+                    throw new Error('No se pudo procesar la consulta');
                 }
 
-                addMessage('assistant', `📝 SQL generado: \`${sqlQuery}\``);
+                // Mostrar información de herramientas MCP usadas
+                if (window.geminiNL2SQL) {
+                    const mcpInfo = window.geminiNL2SQL.getMCPToolsInfo();
+                    showMCPToolsIndicator(mcpInfo);
+                }
 
-                // Paso 2: Ejecutar SQL via MCP
-                showSystemMessage('🔗 Ejecutando consulta en MCP...');
-                await executeQueryViaMCP(sqlQuery, query);
+                // Mostrar respuesta conversacional de Gemini
+                if (result.message) {
+                    showAssistantMessage(result.message);
+                }
+
+                // Si hay SQL generado, ejecutarlo
+                if (result.sql) {
+                    showAssistantMessage(`📝 SQL: \`${result.sql}\``);
+                    
+                    // Paso 2: Ejecutar SQL via MCP
+                    showSystemMessage('🔗 Ejecutando consulta en MCP...');
+                    await executeQueryViaMCP(result.sql, query);
+                } else {
+                    // No hay SQL, solo fue una conversación
+                    console.log('Respuesta conversacional sin SQL');
+                }
 
             } catch (error) {
                 console.error('Error en consulta:', error);
-                addMessage('assistant', `❌ Error: ${error.message}`);
+                showAssistantMessage(`❌ Error: ${error.message}`);
             } finally {
                 // Rehabilitar input
                 sendBtn.disabled = false;
@@ -564,7 +848,7 @@
             console.log('Respuesta MCP recibida:', response);
             
             if (response.error) {
-                addMessage('assistant', `❌ Error MCP: ${response.error.message}`);
+                showAssistantMessage(`❌ Error MCP: ${response.error.message}`);
                 // Limpiar request pendiente
                 if (response.id) {
                     pendingRequests.delete(response.id);
@@ -617,7 +901,7 @@
                             console.error('Error en segundo intento de parsing:', e2);
                         }
                         
-                        addMessage('assistant', `📊 Resultado: ${content.text}`);
+                        showAssistantMessage(`📊 Resultado: ${content.text}`);
                     }
                 }
             }
@@ -666,13 +950,16 @@
         // Manejar resultados de consulta
         function handleQueryResults(data, context) {
             console.log('handleQueryResults llamado con:', { data, context });
+            console.log('🔍 DEBUG - data.rows:', data.rows);
+            console.log('🔍 DEBUG - data completo:', JSON.stringify(data, null, 2));
             
             if (!data.rows || data.rows.length === 0) {
-                addMessage('assistant', '📊 No se encontraron datos para esta consulta.');
+                showAssistantMessage('📊 No se encontraron datos para esta consulta.');
+                console.warn('⚠️ Query retornó 0 resultados. Revisa si la consulta SQL es correcta y si hay datos en la BD.');
                 return;
             }
 
-            addMessage('assistant', `✅ Consulta ejecutada. ${data.rows.length} registros encontrados.`);
+            showAssistantMessage(`✅ Consulta ejecutada. ${data.rows.length} registros encontrados.`);
             
             // Transformar datos y crear gráfico
             console.log('Transformando datos...');
@@ -688,7 +975,7 @@
                     context?.originalQuery || 'Resultados de consulta';
             } else {
                 console.error('No se pudieron transformar los datos');
-                addMessage('assistant', '❌ Error al transformar los datos para el gráfico.');
+                showAssistantMessage('❌ Error al transformar los datos para el gráfico.');
             }
         }
 
@@ -712,7 +999,7 @@
                 placeholder.style.display = 'none';
             } catch (error) {
                 console.error('Error creando gráfico:', error);
-                addMessage('assistant', `❌ Error al crear el gráfico: ${error.message}`);
+                showAssistantMessage(`❌ Error al crear el gráfico: ${error.message}`);
                 placeholder.textContent = 'Error al crear el gráfico';
                 canvas.style.display = 'none';
                 placeholder.style.display = 'block';
@@ -743,18 +1030,257 @@
         }
 
         // Agregar mensaje al chat
-        function addMessage(type, content) {
+        function addMessage(type, content, saveToConversation = true) {
             const messagesContainer = document.getElementById('chat-messages');
             const message = document.createElement('div');
             message.className = `message ${type}`;
             message.innerHTML = content;
             messagesContainer.appendChild(message);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Guardar en la conversación actual
+            if (saveToConversation && currentConversationId) {
+                saveMessageToConversation(type, content);
+            }
+        }
+
+        // Mostrar mensaje del usuario
+        function showUserMessage(content, saveToConversation = true) {
+            addMessage('user', content, saveToConversation);
+        }
+
+        // Mostrar mensaje del asistente
+        function showAssistantMessage(content, saveToConversation = true) {
+            addMessage('assistant', content, saveToConversation);
         }
 
         // Mostrar mensaje del sistema
-        function showSystemMessage(content) {
-            addMessage('system', content);
+        function showSystemMessage(content, saveToConversation = false) {
+            addMessage('system', content, saveToConversation);
+        }
+
+        // Mostrar indicador de herramientas MCP utilizadas
+        function showMCPToolsIndicator(mcpInfo) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const indicator = document.createElement('div');
+            indicator.className = 'mcp-tools-indicator';
+            
+            let schemaSourceBadge = '';
+            let schemaSourceText = '';
+            
+            if (mcpInfo.schemaSource === 'mcp') {
+                schemaSourceBadge = '<span class="schema-source-badge mcp">✅ Desde MCP</span>';
+                schemaSourceText = 'Obtenido directamente del servidor MCP';
+            } else if (mcpInfo.schemaSource === 'cache') {
+                schemaSourceBadge = '<span class="schema-source-badge cache">📦 Desde Cache</span>';
+                schemaSourceText = 'Cache válido';
+            } else if (mcpInfo.schemaSource === 'cache-expired') {
+                schemaSourceBadge = '<span class="schema-source-badge cache">📦 Cache Expirado</span>';
+                schemaSourceText = 'Usando cache expirado - Verifica conexión MCP';
+            } else if (mcpInfo.schemaSource === 'emergency') {
+                schemaSourceBadge = '<span class="schema-source-badge cache" style="background: #ef4444;">⚠️ Emergencia</span>';
+                schemaSourceText = 'Usando schema de emergencia - Funcionalidad limitada';
+            }
+            
+            let toolsHTML = mcpInfo.tools.map(tool => {
+                let statusClass = tool.status;
+                let statusText = tool.status === 'success' ? 'Éxito' : 
+                                tool.status === 'cache' ? 'Cache' : 
+                                tool.status === 'cache-expired' ? 'Cache Exp.' : 
+                                tool.status === 'emergency' ? 'Emergencia' : tool.status;
+                
+                return `
+                    <div class="mcp-tool-item">
+                        <span class="mcp-tool-name">🔧 ${tool.tool}</span>
+                        <span class="mcp-tool-status ${statusClass}">${statusText}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            indicator.innerHTML = `
+                <div class="mcp-tools-header">
+                    🔌 Herramientas MCP Utilizadas
+                    ${schemaSourceBadge}
+                </div>
+                <div style="font-size: 0.8rem; margin-bottom: 0.5rem; opacity: 0.9;">
+                    ${schemaSourceText}
+                </div>
+                ${toolsHTML}
+            `;
+            
+            messagesContainer.appendChild(indicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // ========== FUNCIONES DE GESTIÓN DE CONVERSACIONES ==========
+
+        // Cargar conversaciones desde localStorage
+        function loadConversations() {
+            const saved = localStorage.getItem('analytics_conversations');
+            if (saved) {
+                conversations = JSON.parse(saved);
+            }
+            
+            // Si no hay conversaciones, crear una por defecto
+            if (conversations.length === 0) {
+                createNewConversation();
+            } else {
+                // Cargar la última conversación
+                loadConversation(conversations[0].id);
+            }
+            
+            renderConversationsList();
+        }
+
+        // Guardar conversaciones en localStorage
+        function saveConversations() {
+            localStorage.setItem('analytics_conversations', JSON.stringify(conversations));
+        }
+
+        // Crear nueva conversación
+        function createNewConversation() {
+            const newConv = {
+                id: Date.now().toString(),
+                title: 'Nueva Conversación',
+                preview: 'Sin mensajes aún',
+                timestamp: new Date().toISOString(),
+                messages: []
+            };
+            
+            conversations.unshift(newConv);
+            saveConversations();
+            loadConversation(newConv.id);
+            renderConversationsList();
+        }
+
+        // Cargar una conversación específica
+        function loadConversation(conversationId) {
+            currentConversationId = conversationId;
+            const conv = conversations.find(c => c.id === conversationId);
+            
+            if (!conv) return;
+            
+            // Limpiar el chat actual
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = '';
+            
+            // Cargar mensajes de la conversación
+            conversationMessages = conv.messages || [];
+            
+            if (conversationMessages.length === 0) {
+                showSystemMessage('¡Hola! Puedes hacer consultas en lenguaje natural sobre tus datos.', false);
+            } else {
+                // Renderizar mensajes guardados (sin volver a guardar)
+                conversationMessages.forEach(msg => {
+                    if (msg.type === 'user') {
+                        showUserMessage(msg.text, false);
+                    } else if (msg.type === 'assistant') {
+                        showAssistantMessage(msg.text, false);
+                    } else if (msg.type === 'system') {
+                        showSystemMessage(msg.text, false);
+                    }
+                });
+            }
+            
+            // Actualizar UI de conversaciones
+            renderConversationsList();
+        }
+
+        // Eliminar conversación
+        function deleteConversation(conversationId, event) {
+            event.stopPropagation();
+            
+            if (conversations.length === 1) {
+                alert('No puedes eliminar la última conversación');
+                return;
+            }
+            
+            if (confirm('¿Estás seguro de eliminar esta conversación?')) {
+                conversations = conversations.filter(c => c.id !== conversationId);
+                saveConversations();
+                
+                // Si se eliminó la conversación actual, cargar otra
+                if (currentConversationId === conversationId) {
+                    loadConversation(conversations[0].id);
+                }
+                
+                renderConversationsList();
+            }
+        }
+
+        // Guardar mensaje en la conversación actual
+        function saveMessageToConversation(type, text) {
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (!conv) return;
+            
+            const message = { type, text, timestamp: new Date().toISOString() };
+            conv.messages.push(message);
+            conversationMessages.push(message);
+            
+            // Actualizar título y preview si es el primer mensaje de usuario
+            if (type === 'user' && conv.messages.filter(m => m.type === 'user').length === 1) {
+                conv.title = text.slice(0, 40) + (text.length > 40 ? '...' : '');
+                conv.preview = text.slice(0, 60) + (text.length > 60 ? '...' : '');
+            } else if (type === 'user') {
+                conv.preview = text.slice(0, 60) + (text.length > 60 ? '...' : '');
+            }
+            
+            conv.timestamp = new Date().toISOString();
+            
+            saveConversations();
+            renderConversationsList();
+        }
+
+        // Renderizar lista de conversaciones
+        function renderConversationsList() {
+            const container = document.getElementById('conversations-list');
+            
+            if (conversations.length === 0) {
+                container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 1rem;">No hay conversaciones</div>';
+                return;
+            }
+            
+            container.innerHTML = conversations.map(conv => {
+                const isActive = conv.id === currentConversationId;
+                const date = new Date(conv.timestamp);
+                const timeStr = formatTimeAgo(date);
+                
+                return `
+                    <div class="conversation-item ${isActive ? 'active' : ''}" 
+                         onclick="loadConversation('${conv.id}')"
+                         data-id="${conv.id}">
+                        <div class="conversation-title">${escapeHtml(conv.title)}</div>
+                        <div class="conversation-preview">${escapeHtml(conv.preview)}</div>
+                        <div class="conversation-time">${timeStr}</div>
+                        <button class="delete-conversation-btn" onclick="deleteConversation('${conv.id}', event)">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Formatear tiempo relativo
+        function formatTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Ahora';
+            if (minutes < 60) return `Hace ${minutes}m`;
+            if (hours < 24) return `Hace ${hours}h`;
+            if (days < 7) return `Hace ${days}d`;
+            
+            return date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+        }
+
+        // Escapar HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
     </script>
 </body>

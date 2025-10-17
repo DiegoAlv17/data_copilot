@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const { spawn } = require('child_process');
+const path = require('path');
 
 // Configuración
 const PORT = process.env.PORT || 3002;
@@ -13,13 +14,13 @@ let mcpProcess = null;
 
 console.log('🚀 Iniciando MCP Analytics Server...');
 
-// Servir archivos estáticos
-app.use(express.static(__dirname));
+// Servir archivos estáticos desde public
+app.use(express.static(path.join(__dirname, '../../public')));
 app.use(express.json());
 
 // Rutas principales
 app.get('/', (req, res) => {
-    res.redirect('/frontend-analytics.html');
+    res.redirect('/index.html');
 });
 
 app.get('/mcp-status', (req, res) => {
@@ -28,8 +29,9 @@ app.get('/mcp-status', (req, res) => {
         mcpServer: mcpProcess ? 'connected' : 'disconnected',
         port: PORT,
         endpoints: {
-            dashboard: '/frontend-analytics.html',
-            client: '/client-mcp-direct.html',
+            dashboard: '/',
+            status: '/mcp-status',
+            health: '/health',
             websocket: `ws://localhost:${PORT}`
         },
         timestamp: new Date().toISOString()
@@ -84,9 +86,14 @@ function startMCPServer() {
     console.log('🚀 Iniciando MCP PostgreSQL Server...');
     
     try {
-        mcpProcess = spawn('node', ['mcp-postgres-server.js'], {
+        const mcpServerPath = path.join(__dirname, 'mcp-postgres-server.js');
+        const projectRoot = path.join(__dirname, '../..');
+        
+        mcpProcess = spawn('node', [mcpServerPath], {
             stdio: ['pipe', 'pipe', 'pipe'],
-            shell: true
+            shell: true,
+            cwd: projectRoot,  // Ejecutar desde la raíz del proyecto
+            env: { ...process.env }  // Pasar todas las variables de entorno
         });
 
         // Manejar salida del MCP Server
@@ -133,23 +140,23 @@ function startMCPServer() {
 // Iniciar servidor HTTP
 server.listen(PORT, () => {
     console.log('');
-    console.log('=== MCP Analytics Dashboard ===');
+    console.log('=== 📊 MCP Analytics Dashboard ===');
     console.log('');
     console.log(`🌐 Servidor ejecutándose en puerto ${PORT}`);
-    console.log(`📊 Analytics Dashboard: http://localhost:${PORT}/frontend-analytics.html`);
-    console.log(`🔧 Cliente MCP Directo: http://localhost:${PORT}/client-mcp-direct.html`);
+    console.log(`📊 Dashboard Principal: http://localhost:${PORT}`);
     console.log(`📈 Estado del servidor: http://localhost:${PORT}/mcp-status`);
     console.log(`🔗 WebSocket endpoint: ws://localhost:${PORT}`);
     console.log('');
-    console.log('Características del dashboard:');
-    console.log('   - Consultas en lenguaje natural con Gemini AI');
-    console.log('   - Conversión automática NL -> SQL');
+    console.log('⚡ Características del dashboard:');
+    console.log('   - Consultas conversacionales con Gemini AI');
+    console.log('   - Conversión automática NL → SQL');
     console.log('   - Ejecución vía MCP real (no simulado)');
     console.log('   - Gráficos interactivos con Chart.js');
     console.log('   - Métricas automáticas');
     console.log('   - Múltiples tipos de gráficos');
     console.log('');
-    console.log('Ejemplos de consultas:');
+    console.log('💡 Ejemplos de consultas:');
+    console.log('   "Hola" → Saludo conversacional');
     console.log('   "Muestra los empleados por país"');
     console.log('   "¿Cuáles son los productos más vendidos?"');
     console.log('   "Ventas por categoría de producto"');

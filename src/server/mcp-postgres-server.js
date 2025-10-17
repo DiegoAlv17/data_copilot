@@ -160,7 +160,7 @@ class MCPPostgreSQLServer {
 
     async executeQuery(query) {
         // Importar dinámicamente la conexión a la base de datos
-        const { query: dbQuery } = await import('./database.js');
+        const { query: dbQuery } = await import('../database/database.js');
         
         try {
             const result = await dbQuery(query);
@@ -257,7 +257,7 @@ class MCPPostgreSQLServer {
 }
 
 // Configurar variables de entorno
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 // Verificar conexión de base de datos
 if (!process.env.DATABASE_URI && !process.env.POSTGRES_CONNECTION_STRING) {

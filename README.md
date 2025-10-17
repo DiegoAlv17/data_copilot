@@ -1,208 +1,413 @@
-# 🔗 MCP PostgreSQL Analytics - Dashboard Inteligente
+# 🔗 MCP PostgreSQL Analytics# 🔗 MCP PostgreSQL Analytics - Dashboard Inteligente
 
-Implementación completa del Model Context Protocol (MCP) con dashboard de analytics que acepta consultas en lenguaje natural y genera gráficos automáticamente.
 
-## 🚀 Inicio Rápido
 
-```bash
-# Opción 1: Inicio automático completo (recomendado)
-npm run mcp:start
+Implementación completa de **Model Context Protocol (MCP)** con PostgreSQL, Gemini AI y visualización de datos interactiva.Implementación completa del Model Context Protocol (MCP) con dashboard de analytics que acepta consultas en lenguaje natural y genera gráficos automáticamente.
 
-# Opción 2: Solo Analytics Dashboard
-npm run analytics
 
-# Opción 3: Manual
+
+## 🚀 Características## 🚀 Inicio Rápido
+
+
+
+- **🤖 IA Conversacional**: Interactúa con Gemini AI usando lenguaje natural```bash
+
+- **🔄 NL → SQL**: Conversión automática de lenguaje natural a consultas SQL# Opción 1: Inicio automático completo (recomendado)
+
+- **📊 Visualización**: Gráficos interactivos con Chart.jsnpm run mcp:start
+
+- **🔌 MCP Real**: Protocolo MCP completo (no simulado)
+
+- **💬 Respuestas Contextuales**: Distingue entre saludos, consultas SQL y preguntas fuera de contexto# Opción 2: Solo Analytics Dashboard
+
+- **⚡ Tiempo Real**: WebSocket para comunicación eficientenpm run analytics
+
+
+
+## 📁 Estructura del Proyecto# Opción 3: Manual
+
 npm start
-```
 
-## 🏗️ Arquitectura Completa
+``````
 
-```
-Administrador
-    ↓ "Quiero ver reservas por mes"
-Frontend (UI) - Lenguaje Natural
-    ↓ WebSocket
-Agente LLM (Gemini AI)
-    ↓ Convierte a SQL
-Postgres-MCP Server
-    ↓ Ejecuta consulta
-Base de Datos PostgreSQL
-    ↓ Retorna datos estructurados (JSON)
-Motor de Gráficos (Chart.js/Recharts)
-    ↓ Renderiza gráfico dinámico
-Frontend (UI) - Visualización
-```
+data_copilot/
 
-## 📁 Archivos del Sistema
+├── src/## 🏗️ Arquitectura Completa
 
-```
-mcp-analytics/
-├── 🌐 frontend-analytics.html     # Dashboard principal con UI moderna
+│   ├── server/
+
+│   │   ├── server.js              # Servidor HTTP + WebSocket```
+
+│   │   └── mcp-postgres-server.js # Servidor MCP PostgreSQLAdministrador
+
+│   ├── ai/    ↓ "Quiero ver reservas por mes"
+
+│   │   └── gemini-nl2sql.js       # Conversión NL a SQL con GeminiFrontend (UI) - Lenguaje Natural
+
+│   ├── database/    ↓ WebSocket
+
+│   │   └── database.js            # Conexión PostgreSQLAgente LLM (Gemini AI)
+
+│   └── utils/    ↓ Convierte a SQL
+
+│       ├── chart-engine.js        # Motor de visualizaciónPostgres-MCP Server
+
+│       └── data-transformer.js    # Transformación de datos    ↓ Ejecuta consulta
+
+├── public/Base de Datos PostgreSQL
+
+│   ├── index.html                 # Dashboard principal    ↓ Retorna datos estructurados (JSON)
+
+│   └── js/Motor de Gráficos (Chart.js/Recharts)
+
+│       ├── gemini-nl2sql.js       # Cliente AI    ↓ Renderiza gráfico dinámico
+
+│       ├── chart-engine.js        # Renderizado de gráficosFrontend (UI) - Visualización
+
+│       └── data-transformer.js    # Procesamiento de datos```
+
+├── scripts/
+
+│   └── start.ps1                  # Script de inicio (Windows)## 📁 Archivos del Sistema
+
+├── .env                           # Variables de entorno
+
+├── package.json                   # Dependencias```
+
+└── README.md                      # Este archivomcp-analytics/
+
+```├── 🌐 frontend-analytics.html     # Dashboard principal con UI moderna
+
 ├── 🤖 gemini-nl2sql.js           # Integración Gemini para NL→SQL
-├── 📊 chart-engine.js             # Motor de gráficos Chart.js
+
+## 🛠️ Instalación├── 📊 chart-engine.js             # Motor de gráficos Chart.js
+
 ├── 🔄 data-transformer.js         # Transformador de datos MCP→Charts
-├── 📄 mcp-websocket-proxy.js      # Proxy WebSocket MCP
+
+### Prerrequisitos├── 📄 mcp-websocket-proxy.js      # Proxy WebSocket MCP
+
 ├── 📄 mcp-postgres-server.js      # Servidor MCP real
-├── 🌐 client-mcp-direct.html      # Cliente MCP básico
-├── 📄 database.js                 # Conexión PostgreSQL
-├── 📄 .env                        # Variables de entorno + Gemini API
+
+- **Node.js** v18+ ([Descargar](https://nodejs.org))├── 🌐 client-mcp-direct.html      # Cliente MCP básico
+
+- **PostgreSQL** (Supabase recomendado)├── 📄 database.js                 # Conexión PostgreSQL
+
+- **API Key de Gemini** ([Google AI Studio](https://makersuite.google.com/app/apikey))├── 📄 .env                        # Variables de entorno + Gemini API
+
 ├── 🔧 start-mcp-analytics.ps1     # Script de inicio analytics
-└── 📚 README.md                   # Este archivo
+
+### Pasos└── 📚 README.md                   # Este archivo
+
 ```
 
-## 🔧 Configuración
+1. **Clonar el repositorio**
 
-Archivo `.env`:
-```env
+   ```bash## 🔧 Configuración
+
+   git clone <repository-url>
+
+   cd data_copilotArchivo `.env`:
+
+   ``````env
+
 DATABASE_URI=postgresql://postgres.zdbrjkqbolnzvbqpnhhz:data-copilot@aws-1-us-east-2.pooler.supabase.com:6543/postgres
-DATABASE_URL=postgresql://postgres.zdbrjkqbolnzvbqpnhhz:data-copilot@aws-1-us-east-2.pooler.supabase.com:6543/postgres
 
-# Gemini API Configuration
-GEMINI_API_KEY=AIzaSyA3e8v6QI88u6b_jyUQQY8W2peT5E4uHmg
+2. **Instalar dependencias**DATABASE_URL=postgresql://postgres.zdbrjkqbolnzvbqpnhhz:data-copilot@aws-1-us-east-2.pooler.supabase.com:6543/postgres
+
+   ```bash
+
+   npm install# Gemini API Configuration
+
+   ```GEMINI_API_KEY=AIzaSyA3e8v6QI88u6b_jyUQQY8W2peT5E4uHmg
+
 ```
 
-## 🎯 ¿Cómo Funciona?
+3. **Configurar variables de entorno**
 
-### 1. **Consulta en Lenguaje Natural**
-```
-Usuario: "Muestra los empleados por país"
-```
+   ## 🎯 ¿Cómo Funciona?
 
-### 2. **Conversión con Gemini AI**
-```sql
-SELECT country, COUNT(*) as total_empleados 
+   Crear archivo `.env` en la raíz:
+
+   ```env### 1. **Consulta en Lenguaje Natural**
+
+   # Gemini AI```
+
+   GEMINI_API_KEY=tu_api_key_aquiUsuario: "Muestra los empleados por país"
+
+   ```
+
+   # PostgreSQL (Supabase)
+
+   DATABASE_URI=postgresql://user:password@host:port/database### 2. **Conversión con Gemini AI**
+
+   POSTGRES_CONNECTION_STRING=postgresql://user:password@host:port/database```sql
+
+   ```SELECT country, COUNT(*) as total_empleados 
+
 FROM employees 
-GROUP BY country 
-ORDER BY total_empleados DESC;
-```
 
-### 3. **Ejecución via MCP**
-```
-WebSocket → MCP Server → PostgreSQL → Resultados JSON
-```
+4. **Iniciar el servidor**GROUP BY country 
 
-### 4. **Visualización Automática**
-```
+   ORDER BY total_empleados DESC;
+
+   **Windows (PowerShell):**```
+
+   ```powershell
+
+   .\scripts\start.ps1### 3. **Ejecución via MCP**
+
+   ``````
+
+   WebSocket → MCP Server → PostgreSQL → Resultados JSON
+
+   **Linux/Mac:**```
+
+   ```bash
+
+   npm start### 4. **Visualización Automática**
+
+   ``````
+
 Datos → Transformador → Chart.js → Gráfico Interactivo
+
+5. **Abrir el dashboard**```
+
+   
+
+   Navega a: http://localhost:3002## 🛠️ Herramientas y Características
+
+
+
+## 💡 Uso### 🤖 **Agente LLM (Gemini)**
+
+- Conversión inteligente de lenguaje natural a SQL
+
+### Consultas de Ejemplo- Validación de consultas generadas
+
+- Soporte para consultas complejas con JOINs
+
+**Saludos y Conversación:**- Manejo de fechas, agregaciones y filtros
+
 ```
 
-## 🛠️ Herramientas y Características
+"Hola"### 📊 **Motor de Gráficos**
 
-### 🤖 **Agente LLM (Gemini)**
-- Conversión inteligente de lenguaje natural a SQL
-- Validación de consultas generadas
-- Soporte para consultas complejas con JOINs
-- Manejo de fechas, agregaciones y filtros
+"¿Cómo estás?"- **Tipos soportados**: Barras, Líneas, Circular, Dona, Dispersión, Radar
 
-### 📊 **Motor de Gráficos**
-- **Tipos soportados**: Barras, Líneas, Circular, Dona, Dispersión, Radar
-- **Interactividad**: Hover, zoom, exportación PNG
-- **Responsive**: Adaptable a diferentes pantallas
+"Gracias"- **Interactividad**: Hover, zoom, exportación PNG
+
+```- **Responsive**: Adaptable a diferentes pantallas
+
 - **Animaciones**: Transiciones suaves
 
-### 🔄 **Transformador de Datos**
-- **Auto-detección**: Reconoce tipos de datos automáticamente
-- **Series temporales**: Gráficos de evolución temporal
-- **Datos categóricos**: Distribuciones y comparaciones
-- **Métricas automáticas**: Total, promedio, máximo, mínimo
+**Consultas SQL:**
 
-### 🌐 **Frontend Moderno**
+```### 🔄 **Transformador de Datos**
+
+"Muestra los empleados por país"- **Auto-detección**: Reconoce tipos de datos automáticamente
+
+"¿Cuáles son los productos más vendidos?"- **Series temporales**: Gráficos de evolución temporal
+
+"Ventas por categoría de producto"- **Datos categóricos**: Distribuciones y comparaciones
+
+"Evolución de pedidos por mes"- **Métricas automáticas**: Total, promedio, máximo, mínimo
+
+"Top 5 clientes con más órdenes"
+
+```### 🌐 **Frontend Moderno**
+
 - **Chat interface**: Para consultas en lenguaje natural
-- **Panel de gráficos**: Visualización en tiempo real
-- **Métricas rápidas**: KPIs automáticos
-- **Ejemplos integrados**: Consultas predefinidas
 
-## 🔗 Enlaces y Puertos
+**Preguntas Fuera de Contexto:**- **Panel de gráficos**: Visualización en tiempo real
+
+```- **Métricas rápidas**: KPIs automáticos
+
+"¿Qué día es hoy?"- **Ejemplos integrados**: Consultas predefinidas
+
+"¿Cómo está el clima?"
+
+```## 🔗 Enlaces y Puertos
+
+→ Gemini responderá educadamente que solo puede ayudar con consultas de base de datos
 
 - **Analytics Dashboard**: `file://frontend-analytics.html`
-- **Cliente MCP Básico**: `file://client-mcp-direct.html`
+
+## 🏗️ Arquitectura- **Cliente MCP Básico**: `file://client-mcp-direct.html`
+
 - **Estado MCP**: http://localhost:3002/mcp-status
-- **WebSocket Endpoint**: ws://localhost:3002
 
-## 📊 Consultas de Ejemplo
+```- **WebSocket Endpoint**: ws://localhost:3002
 
-### 📈 **Análisis de Empleados**
-```
-"Muestra los empleados por país"
-"¿Cuántos empleados hay en cada región?"
-"Empleados contratados por año"
-```
+┌─────────────────┐
 
-### 🛒 **Análisis de Ventas**
-```
-"¿Cuáles son los productos más vendidos?"
-"Ventas por categoría de producto"
-"Evolución de pedidos por mes"
-```
+│   Frontend      │## 📊 Consultas de Ejemplo
 
-### 👥 **Análisis de Clientes**
-```
-"Top 10 clientes con más pedidos"
-"Distribución de clientes por país"
-"Clientes más activos este año"
+│  (index.html)   │
+
+└────────┬────────┘### 📈 **Análisis de Empleados**
+
+         │ WebSocket```
+
+         ↓"Muestra los empleados por país"
+
+┌─────────────────┐"¿Cuántos empleados hay en cada región?"
+
+│  HTTP Server    │"Empleados contratados por año"
+
+│  (server.js)    │```
+
+└────────┬────────┘
+
+         │### 🛒 **Análisis de Ventas**
+
+         ↓```
+
+┌─────────────────┐      ┌──────────────┐"¿Cuáles son los productos más vendidos?"
+
+│   MCP Server    │◄────►│  PostgreSQL  │"Ventas por categoría de producto"
+
+│ (mcp-postgres-  │      │   Database   │"Evolución de pedidos por mes"
+
+│   server.js)    │      └──────────────┘```
+
+└─────────────────┘
+
+         ↑### 👥 **Análisis de Clientes**
+
+         │```
+
+┌─────────────────┐"Top 10 clientes con más pedidos"
+
+│   Gemini AI     │"Distribución de clientes por país"
+
+│  (NL → SQL)     │"Clientes más activos este año"
+
+└─────────────────┘```
+
 ```
 
 ### 📦 **Análisis de Productos**
-```
+
+## 🔧 Scripts Disponibles```
+
 "Productos con mayor stock"
-"Categorías más populares"
-"Productos descontinuados"
-```
 
-## 🎨 Tipos de Gráficos Disponibles
+```bash"Categorías más populares"
 
-| Tipo | Ideal Para | Ejemplo |
+npm start          # Iniciar servidor en producción"Productos descontinuados"
+
+npm run dev        # Iniciar servidor en desarrollo```
+
+npm run mcp:start  # Iniciar solo MCP server
+
+```## 🎨 Tipos de Gráficos Disponibles
+
+
+
+## 📊 Tipos de Gráficos Soportados| Tipo | Ideal Para | Ejemplo |
+
 |------|------------|---------|
-| 📊 **Barras** | Comparaciones categóricas | Empleados por país |
-| 📈 **Líneas** | Series temporales | Ventas por mes |
-| 🥧 **Circular** | Distribuciones (≤8 categorías) | Productos por categoría |
-| 🍩 **Dona** | Proporciones con centro libre | Participación de mercado |
+
+- 📈 **Barras**: Comparaciones categóricas| 📊 **Barras** | Comparaciones categóricas | Empleados por país |
+
+- 📉 **Líneas**: Tendencias temporales| 📈 **Líneas** | Series temporales | Ventas por mes |
+
+- 🥧 **Pastel**: Distribuciones porcentuales| 🥧 **Circular** | Distribuciones (≤8 categorías) | Productos por categoría |
+
+- 🍩 **Dona**: Distribuciones con centro vacío| 🍩 **Dona** | Proporciones con centro libre | Participación de mercado |
+
+- 📊 **Mixtos**: Combinaciones de tipos
 
 ## 🚀 Flujo de Trabajo Completo
 
+## 🔐 Seguridad
+
 1. **Usuario** escribe consulta en lenguaje natural
-2. **Gemini AI** convierte la consulta a SQL válido
-3. **MCP WebSocket Proxy** envía la consulta al servidor MCP
-4. **MCP PostgreSQL Server** ejecuta la consulta en la base de datos
-5. **PostgreSQL** retorna los datos estructurados
+
+- Las credenciales se almacenan en `.env` (no incluido en Git)2. **Gemini AI** convierte la consulta a SQL válido
+
+- Validación de SQL para prevenir inyecciones3. **MCP WebSocket Proxy** envía la consulta al servidor MCP
+
+- Límite de 100 filas por consulta4. **MCP PostgreSQL Server** ejecuta la consulta en la base de datos
+
+- Timeout de 10 segundos en operaciones MCP5. **PostgreSQL** retorna los datos estructurados
+
 6. **Data Transformer** adapta los datos para gráficos
-7. **Chart Engine** genera la visualización con Chart.js
+
+## 🐛 Troubleshooting7. **Chart Engine** genera la visualización con Chart.js
+
 8. **Frontend** muestra el gráfico y métricas automáticas
 
-## 🔧 Comandos Útiles
+### Error: "Conexión MCP no disponible"
+
+- Verifica que el puerto 3002 esté libre## 🔧 Comandos Útiles
+
+- Asegúrate de que `DATABASE_URI` esté configurado correctamente
 
 ```bash
-# Iniciar sistema completo
-npm run mcp:start
+
+### Error: "Schema vacío"# Iniciar sistema completo
+
+- Verifica la conexión a PostgreSQLnpm run mcp:start
+
+- Revisa que las tablas existan en la base de datos
 
 # Solo abrir dashboard
-npm run analytics
 
-# Solo abrir cliente MCP básico
+### Gráficos no se muestrannpm run analytics
+
+- Abre la consola del navegador (F12)
+
+- Verifica que Chart.js se haya cargado correctamente# Solo abrir cliente MCP básico
+
 npm run client
 
+## 📝 Licencia
+
 # Solo proxy WebSocket
-npm run proxy
 
-# Solo servidor MCP
+ISCnpm run proxy
+
+
+
+## 👤 Autor# Solo servidor MCP
+
 npm run server
-```
 
-## 🎯 Características Técnicas
+MCP PostgreSQL Analytics Team```
 
-### ✅ **MCP Real**
-- Protocolo JSON-RPC 2.0 completo
-- Conexión stdio nativa (como Claude Desktop)
-- Herramientas MCP: execute_query, describe_table, get_schema
 
-### ✅ **Gemini AI**
+
+## 🤝 Contribuciones## 🎯 Características Técnicas
+
+
+
+Las contribuciones son bienvenidas. Por favor:### ✅ **MCP Real**
+
+1. Fork el proyecto- Protocolo JSON-RPC 2.0 completo
+
+2. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)- Conexión stdio nativa (como Claude Desktop)
+
+3. Commit tus cambios (`git commit -m 'Agregar nueva funcionalidad'`)- Herramientas MCP: execute_query, describe_table, get_schema
+
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+
+5. Abre un Pull Request### ✅ **Gemini AI**
+
 - API key integrada
-- Prompt engineering optimizado para SQL
-- Validación de consultas generadas
-- Manejo de errores inteligente
 
-### ✅ **Chart.js Avanzado**
-- Múltiples tipos de gráficos
+## 🔗 Enlaces Útiles- Prompt engineering optimizado para SQL
+
+- Validación de consultas generadas
+
+- [Model Context Protocol Spec](https://modelcontextprotocol.io)- Manejo de errores inteligente
+
+- [Gemini API Docs](https://ai.google.dev/docs)
+
+- [Chart.js Documentation](https://www.chartjs.org/docs/)### ✅ **Chart.js Avanzado**
+
+- [Supabase PostgreSQL](https://supabase.com/docs/guides/database)- Múltiples tipos de gráficos
+
 - Animaciones y transiciones
 - Exportación de imágenes
 - Configuración responsive
