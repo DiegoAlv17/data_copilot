@@ -656,8 +656,14 @@
         let currentConversationId = null;
         let conversationMessages = []; // Mensajes de la conversación actual
 
-        // Configuración
-        const WEBSOCKET_URL = 'ws://localhost:3002';
+        // Configuración - Detectar entorno automáticamente
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        
+        // En producción, el WebSocket usa el mismo dominio (Render maneja HTTP y WS en el mismo puerto)
+        const WEBSOCKET_URL = isProduction 
+            ? `wss://${window.location.host}` // Producción: wss://agente-bi.onrender.com
+            : 'ws://localhost:3002';          // Desarrollo
+            
         const GEMINI_API_KEY = 'AIzaSyCQJm1ieLoyhnpiy-wpAAdsKK43zQGvDhs';
 
         // Inicialización
