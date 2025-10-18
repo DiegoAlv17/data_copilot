@@ -658,13 +658,26 @@
 
         // Configuración - Detectar entorno automáticamente
         const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        const isVercel = window.location.hostname.includes('vercel.app');
+        const isRender = window.location.hostname.includes('render.com') || window.location.hostname.includes('onrender.com');
         
-        // En producción, el WebSocket usa el mismo dominio (Render maneja HTTP y WS en el mismo puerto)
-        const WEBSOCKET_URL = isProduction 
-            ? `wss://${window.location.host}` // Producción: wss://agente-bi.onrender.com
-            : 'ws://localhost:3002';          // Desarrollo
+        // Configuración de WebSocket según plataforma
+        let WEBSOCKET_URL;
+        if (isVercel) {
+            // Vercel: Conectar a backend externo en Render
+            WEBSOCKET_URL = 'wss://agente-bi.onrender.com'; // ⚠️ CAMBIAR POR TU URL DE RENDER
+        } else if (isRender) {
+            // Render: Usar mismo dominio
+            WEBSOCKET_URL = `wss://${window.location.host}`;
+        } else {
+            // Desarrollo local
+            WEBSOCKET_URL = 'ws://localhost:3002';
+        }
             
         const GEMINI_API_KEY = 'AIzaSyCQJm1ieLoyhnpiy-wpAAdsKK43zQGvDhs';
+        
+        console.log('🌐 Entorno detectado:', { isProduction, isVercel, isRender });
+        console.log('🔗 WebSocket URL:', WEBSOCKET_URL);
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
