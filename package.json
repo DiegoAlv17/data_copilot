@@ -1,30 +1,18 @@
 {
-  "name": "mcp-postgres-analytics",
+  "name": "data-copilot-monorepo",
   "version": "1.0.0",
-  "description": "Implementación completa de MCP PostgreSQL con Analytics y Gemini AI",
-  "main": "src/server/server.js",
-  "scripts": {
-    "start": "node src/server/server.js",
-    "dev": "node src/server/server.js",
-    "mcp:start": "node src/server/mcp-postgres-server.js",
-    "server": "node src/server/server.js"
-  },
-  "keywords": [
-    "mcp",
-    "postgres", 
-    "websocket",
-    "model-context-protocol",
-    "gemini",
-    "analytics",
-    "charts",
-    "ai"
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
   ],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "postgres": "^3.4.7",
-    "ws": "^8.18.3"
+  "scripts": {
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "install:all": "npm install --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

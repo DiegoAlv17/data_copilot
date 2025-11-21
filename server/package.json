@@ -1,0 +1,46 @@
+{
+  "name": "data-copilot-server",
+  "version": "1.0.0",
+  "description": "Implementación completa de MCP PostgreSQL con Analytics y Gemini AI",
+  "main": "dist/server/server.js",
+  "scripts": {
+    "start": "node dist/server/server.js",
+    "dev": "nodemon --exec ts-node src/server/server.ts",
+    "build": "tsc",
+    "mcp:start": "ts-node src/server/mcp-postgres-server.ts",
+    "server": "ts-node src/server/server.ts"
+  },
+  "keywords": [
+    "mcp",
+    "postgres",
+    "websocket",
+    "model-context-protocol",
+    "gemini",
+    "analytics",
+    "charts",
+    "ai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/community": "^1.0.4",
+    "@langchain/core": "^1.0.6",
+    "@langchain/google-genai": "^1.0.3",
+    "@langchain/langgraph": "^1.0.2",
+    "@modelcontextprotocol/sdk": "^1.22.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "langchain": "^1.0.6",
+    "postgres": "^3.4.7",
+    "ws": "^8.18.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "@types/ws": "^8.18.1",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,249 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Send, Loader2, Bot, User } from 'lucide-react';
+import type { ChatMessage } from '../types';
+import { useWebSocket } from '../contexts/WebSocketContext';
+import { Message } from './Message';
+import { DashboardGrid } from './DashboardGrid';
+import { ChartRenderer } from './charts/ChartRenderer';
+
+export const SplitViewChat: React.FC = () => {
+  const { sendMessage, lastMessage, isConnected } = useWebSocket();
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const visualizationsRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    if (lastMessage) {
+      setIsLoading(false);
+      
+      if (lastMessage.type === 'error') {
+         const errorMessage: ChatMessage = {
+          id: Date.now().toString(),
+          role: 'system',
+          content: `Error: ${lastMessage.error}`,
+          timestamp: Date.now(),
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } else if (lastMessage.type === 'dashboard') {
+        const dashboardMessage: ChatMessage = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: lastMessage.text || "Aquí está tu dashboard completo.",
+          timestamp: Date.now(),
+          isDashboard: true,
+          dashboardTitle: lastMessage.dashboardTitle,
+          dashboardWidgets: lastMessage.widgets,
+          queryIntent: lastMessage.queryIntent,
+        };
+        setMessages(prev => [...prev, dashboardMessage]);
+      } else if (lastMessage.type === 'result') {
+        const assistantMessage: ChatMessage = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: lastMessage.text || "Aquí están los datos que solicitaste.",
+          timestamp: Date.now(),
+          chartData: lastMessage.chartData,
+          chartType: lastMessage.chartType,
+          chartConfig: lastMessage.chartConfig,
+          sql: lastMessage.sql,
+          queryIntent: lastMessage.queryIntent,
+          thoughtProcess: lastMessage.thoughtProcess
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+      }
+    }
+  }, [lastMessage]);
+
+  const handleSend = () => {
+    if (!input.trim() || !isConnected) return;
+
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: input,
+      timestamp: Date.now(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+    sendMessage({ type: 'query', content: input });
+    setInput('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  // Obtener última visualización (dashboard o chart)
+  const lastVisualization = messages.length > 0 
+    ? messages.filter(m => m.role === 'assistant' && (m.isDashboard || m.chartData)).pop()
+    : null;
+
+  const hasMessages = messages.length > 0;
+
+  return (
+    <div className="flex h-full">
+      {/* Panel Izquierdo - Chat */}
+      <div className={`flex flex-col border-r border-white/10 transition-all duration-300 ${hasMessages ? 'w-1/5' : 'w-full'}`}>
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto">
+          {messages.length === 0 ? (
+            // Empty State
+            <div className="h-full flex flex-col items-center justify-center text-text-secondary p-8">
+              <h1 className="text-4xl font-bold text-text mb-8">Data Copilot</h1>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full">
+                {['Muéstrame los 5 productos principales', 'Ventas por región', 'Tendencia de ingresos mensual', 'Estado financiero'].map((example) => (
+                  <button 
+                    key={example}
+                    onClick={() => setInput(example)}
+                    className="p-4 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 text-left transition-colors text-sm"
+                  >
+                    "{example}"
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            // Messages List
+            <div className="flex flex-col">
+              {messages.map((msg) => (
+                <div key={msg.id} className={`w-full border-b border-black/10 dark:border-gray-900/50 ${msg.role === 'user' ? "bg-background" : "bg-surface"} p-4`}>
+                  <div className="max-w-3xl mx-auto flex gap-4">
+                    <div className="w-8 flex flex-col relative items-end">
+                      <div className={`relative h-7 w-7 p-1 rounded-sm text-white flex items-center justify-center ${msg.role === 'user' ? "bg-gray-500" : "bg-primary"}`}>
+                        {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="prose prose-invert max-w-none">
+                        <p className="text-sm">{msg.content}</p>
+                      </div>
+                      
+                      {/* Query Intent */}
+                      {msg.queryIntent && (
+                        <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-xs">
+                          <div className="font-semibold text-blue-400 mb-1">🎯 Análisis de Intención</div>
+                          <div className="text-gray-300">
+                            {msg.queryIntent.isAmbiguous && (
+                              <div className="mb-2 text-yellow-400">
+                                <strong>⚠️ Consulta ambigua detectada</strong>
+                              </div>
+                            )}
+                            {msg.queryIntent.enrichedQuery && (
+                              <div><strong>Consulta enriquecida:</strong> {msg.queryIntent.enrichedQuery}</div>
+                            )}
+                            {msg.queryIntent.assumptions && (
+                              <div className="mt-2">
+                                <strong>Suposiciones:</strong>
+                                <ul className="ml-4 mt-1">
+                                  {msg.queryIntent.assumptions.timePeriod && <li>• Período: {msg.queryIntent.assumptions.timePeriod}</li>}
+                                  {msg.queryIntent.assumptions.region && <li>• Región: {msg.queryIntent.assumptions.region}</li>}
+                                  {msg.queryIntent.assumptions.metric && <li>• Métrica: {msg.queryIntent.assumptions.metric}</li>}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SQL Query */}
+                      {msg.sql && (
+                        <details className="mt-3">
+                          <summary className="text-xs text-text-secondary cursor-pointer hover:text-white">
+                            Ver Consulta SQL
+                          </summary>
+                          <pre className="mt-2 p-3 bg-black/30 rounded-md text-xs text-green-400 overflow-x-auto">
+                            {msg.sql}
+                          </pre>
+                        </details>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {isLoading && (
+                <div className="w-full bg-surface border-b border-black/10 dark:border-gray-900/50 p-4">
+                  <div className="max-w-3xl mx-auto flex gap-4">
+                    <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
+                      <Bot size={16} className="text-white animate-pulse" />
+                    </div>
+                    <div className="flex items-center gap-2 text-text-secondary">
+                      <Loader2 size={16} className="animate-spin" />
+                      <span className="text-sm">Analizando tu consulta...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Input Area */}
+        <div className="border-t border-white/10 p-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex gap-3 items-end bg-surface rounded-lg border border-white/10 p-3">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Pregunta sobre tus datos..."
+                className="flex-1 bg-transparent resize-none outline-none text-sm max-h-32"
+                rows={1}
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || !isConnected}
+                className="p-2 bg-primary hover:bg-primary/80 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-md transition-colors"
+              >
+                <Send size={18} className="text-white" />
+              </button>
+            </div>
+            <div className="text-center text-xs text-text-secondary mt-2">
+              Data Copilot puede cometer errores. Considera verificar la información importante.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Panel Derecho - Visualizaciones */}
+      {hasMessages && lastVisualization && (
+        <div className="w-4/5 flex flex-col bg-gray-900">
+          <div className="border-b border-white/10 p-4">
+            <h2 className="text-lg font-semibold text-text">
+              {lastVisualization.isDashboard ? lastVisualization.dashboardTitle || 'Panel de Control' : 'Visualización'}
+            </h2>
+          </div>
+          
+          <div ref={visualizationsRef} className="flex-1 overflow-auto p-6">
+            {lastVisualization.isDashboard && lastVisualization.dashboardWidgets ? (
+              <DashboardGrid 
+                widgets={lastVisualization.dashboardWidgets}
+              />
+            ) : lastVisualization.chartData && lastVisualization.chartType ? (
+              <ChartRenderer 
+                type={lastVisualization.chartType} 
+                data={lastVisualization.chartData} 
+                config={lastVisualization.chartConfig || {}}
+              />
+            ) : null}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
