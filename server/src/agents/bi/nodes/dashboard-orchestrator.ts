@@ -38,15 +38,27 @@ Dashboard indicators:
 - Questions combining multiple metrics (e.g., "sales, revenue, and profit")
 
 Examples of DASHBOARD queries:
-- "Quiero ver el estado financiero de mi empresa" → Generate these sub-queries:
-  1. "Total revenue this year" (Card)
-  2. "Total number of orders" (Card)
-  3. "Average order value" (Card)
-  4. "Monthly revenue trend for the last 12 months" (Line Chart)
-  5. "Sales by product category" (Bar Chart)
-  6. "Sales by country" (Bar Chart)
-  7. "Top 10 customers by total revenue" (Table)
-  8. "Top 10 best-selling products" (Table)
+- "Quiero ver el estado financiero de mi empresa" → Generate these sub-queries (using ONLY available data):
+  1. "Total revenue from all orders" (Card - calculate from order_details: SUM(unit_price * quantity * (1 - discount)))
+  2. "Total number of orders" (Card - COUNT from orders table)
+  3. "Average order value" (Card - AVG of order totals)
+  4. "Monthly order trend for 1997" (Line Chart - group by month, year 1997)
+  5. "Revenue by product category" (Bar Chart - JOIN products, categories, order_details)
+  6. "Orders by customer country" (Bar Chart - use customers.country)
+  7. "Top 10 customers by total spent" (Table - calculate from orders and order_details)
+  8. "Top 10 best-selling products by quantity" (Table - use order_details.quantity)
+
+CRITICAL TIME PERIOD RULES:
+- The database contains historical data from 1996-1998 (Northwind dataset)
+- NEVER filter by 'current year' or dates after 1998
+- Default to 'all time' or specific years like 1997, 1998
+- For "last 12 months" queries, use year 1997 or 1998
+
+IMPORTANT: The database is a Northwind-style database with tables like orders, customers, products, categories, order_details, employees, suppliers.
+- DO NOT generate queries asking for columns like 'debt', 'department', 'profit_margin', 'assets', 'liabilities' - they don't exist.
+- Calculate revenue from: order_details (unit_price * quantity * (1 - discount))
+- For financial analysis, use available data: orders, order_details, products, customers.
+- Vendors = Suppliers (use suppliers table)
 
 - "Show me a complete sales overview" → Sales by region, by product, trends, top performers
 - "Dashboard de ventas" → Multiple sales metrics

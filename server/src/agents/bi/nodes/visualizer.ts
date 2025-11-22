@@ -60,6 +60,8 @@ export const visualizerNode = async (state: AgentState) => {
     const content = response.content.toString().replace(/```json/g, "").replace(/```/g, "").trim();
     const result = JSON.parse(content);
 
+    console.log(`  📊 Visualization type: ${result.visualizationType}`);
+
     return {
       visualizationType: result.visualizationType,
       chartConfig: result.chartConfig,
@@ -67,11 +69,13 @@ export const visualizerNode = async (state: AgentState) => {
       messages: [new HumanMessage(result.summary || "Here is the visualization for your data.")],
     };
   } catch (error) {
-    console.error("Error parsing visualization config:", error);
+    console.error("  ⚠️ Error parsing visualization config:", error);
+    console.error("  Response content:", response.content.toString().substring(0, 200));
     // Fallback a tabla si falla la IA
     return {
       visualizationType: "table",
       chartConfig: { columns: Object.keys(state.queryResult[0]) },
+      messages: [response],
     };
   }
 };

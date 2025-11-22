@@ -95,9 +95,9 @@ export const SplitViewChat: React.FC = () => {
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full bg-gray-50">
       {/* Panel Izquierdo - Chat */}
-      <div className={`flex flex-col border-r border-white/10 transition-all duration-300 ${hasMessages ? 'w-1/5' : 'w-full'}`}>
+      <div className={`flex flex-col border-r border-gray-200 bg-gray-50 transition-all duration-300 ${hasMessages ? 'w-1/5' : 'w-full'}`}>
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto">
           {messages.length === 0 ? (
@@ -134,11 +134,11 @@ export const SplitViewChat: React.FC = () => {
                       
                       {/* Query Intent */}
                       {msg.queryIntent && (
-                        <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-xs">
-                          <div className="font-semibold text-blue-400 mb-1">🎯 Análisis de Intención</div>
-                          <div className="text-gray-300">
+                        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md text-xs text-gray-900">
+                          <div className="font-semibold text-blue-700 mb-1">🎯 Análisis de Intención</div>
+                          <div className="text-gray-800">
                             {msg.queryIntent.isAmbiguous && (
-                              <div className="mb-2 text-yellow-400">
+                              <div className="mb-2 text-yellow-700">
                                 <strong>⚠️ Consulta ambigua detectada</strong>
                               </div>
                             )}
@@ -162,10 +162,10 @@ export const SplitViewChat: React.FC = () => {
                       {/* SQL Query */}
                       {msg.sql && (
                         <details className="mt-3">
-                          <summary className="text-xs text-text-secondary cursor-pointer hover:text-white">
-                            Ver Consulta SQL
+                          <summary className="text-xs text-blue-700 cursor-pointer hover:text-blue-900">
+                            Ver consulta SQL
                           </summary>
-                          <pre className="mt-2 p-3 bg-black/30 rounded-md text-xs text-green-400 overflow-x-auto">
+                          <pre className="mt-2 p-4 bg-white rounded-xl border border-gray-200 text-xs text-gray-900 overflow-x-auto shadow-[0_6px_18px_-6px_rgba(0,0,0,0.15)]">
                             {msg.sql}
                           </pre>
                         </details>
@@ -194,27 +194,34 @@ export const SplitViewChat: React.FC = () => {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-white/10 p-4">
+        <div className="border-t border-white/10 p-4 bg-transparent">
           <div className="max-w-3xl mx-auto">
-            <div className="flex gap-3 items-end bg-surface rounded-lg border border-white/10 p-3">
+            {/* Contenedor flotante */}
+            <div
+              className="group relative flex gap-3 items-end rounded-2xl border border-gray-300 bg-white p-4 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.25),0_0_18px_rgba(59,130,246,0.15)] transition-all duration-300 focus-within:shadow-[0_10px_40px_-8px_rgba(0,0,0,0.35),0_0_28px_rgba(59,130,246,0.35)] focus-within:-translate-y-0.5 focus-within:border-blue-500"
+            >
+              {/* Glow decorativo */}
+              <div className="pointer-events-none absolute inset-0 rounded-2xl ring-0 group-focus-within:ring-2 ring-blue-500/30 transition duration-300" />
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Pregunta sobre tus datos..."
-                className="flex-1 bg-transparent resize-none outline-none text-sm max-h-32"
+                aria-label="Ingresar consulta de datos"
+                className="flex-1 bg-transparent resize-none outline-none text-sm max-h-40 text-gray-900 placeholder-gray-500 tracking-wide leading-relaxed"
                 rows={1}
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || !isConnected}
-                className="p-2 bg-primary hover:bg-primary/80 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-md transition-colors"
+                className="p-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-blue-500/40 active:scale-95"
+                aria-label="Enviar consulta"
               >
                 <Send size={18} className="text-white" />
               </button>
             </div>
-            <div className="text-center text-xs text-text-secondary mt-2">
-              Data Copilot puede cometer errores. Considera verificar la información importante.
+            <div className="text-center text-xs text-gray-600 mt-3">
+              Agente BI puede cometer errores. Verifica información crítica antes de decidir.
             </div>
           </div>
         </div>
@@ -222,9 +229,9 @@ export const SplitViewChat: React.FC = () => {
 
       {/* Panel Derecho - Visualizaciones */}
       {hasMessages && lastVisualization && (
-        <div className="w-4/5 flex flex-col bg-gray-900">
-          <div className="border-b border-white/10 p-4">
-            <h2 className="text-lg font-semibold text-text">
+        <div className="w-4/5 flex flex-col bg-white">
+          <div className="border-b border-gray-200 p-4">
+            <h2 className="text-lg font-semibold text-gray-900">
               {lastVisualization.isDashboard ? lastVisualization.dashboardTitle || 'Panel de Control' : 'Visualización'}
             </h2>
           </div>

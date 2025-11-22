@@ -65,6 +65,20 @@ class MCPPostgreSQLServer {
                 }
             },
             {
+                name: 'get_table_columns',
+                description: 'Get only the column names and data types for a specific table (lightweight)',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        table_name: {
+                            type: 'string',
+                            description: 'Name of the table to get columns for'
+                        }
+                    },
+                    required: ['table_name']
+                }
+            },
+            {
                 name: 'describe_table',
                 description: 'Get the schema description of a single table',
                 inputSchema: {
@@ -191,6 +205,18 @@ class MCPPostgreSQLServer {
                     });
                     break;
 
+                case 'get_table_columns':
+                    const tableColumns = await this.getTableColumns(args.table_name);
+                    this.sendResponse(id, {
+                        content: [
+                            {
+                                type: 'text',
+                                text: JSON.stringify(tableColumns, null, 2)
+                            }
+                        ]
+                    });
+                    break;
+
                 case 'describe_table':
                     const tableSchema = await this.describeTable(args.table_name);
                     this.sendResponse(id, {
@@ -259,6 +285,30 @@ class MCPPostgreSQLServer {
             };
         } catch (error: any) {
             throw new Error(`Error describing table ${tableName}: ${error.message}`);
+        }
+    }
+
+    // NUEVO: Obtener solo columnas (nombre y tipo) de una tabla específica
+    async getTableColumns(tableName: string) {
+        const query = `
+            SELECT 
+                column_name,
+                data_type
+            FROM information_schema.columns 
+            WHERE table_name = $1 
+              AND table_schema = 'public'
+            ORDER BY ordinal_position;
+        `;
+
+        try {
+            const result = await this.executeQuery(query.replace('$1', `'${tableName}'`));
+            console.error(`✅ [MCP] Columnas obtenidas para tabla '${tableName}': ${result.rows.length} columnas`);
+            return {
+                table_name: tableName,
+                columns: result.rows
+            };
+        } catch (error: any) {
+            throw new Error(`Error getting columns for table ${tableName}: ${error.message}`);
         }
     }
 

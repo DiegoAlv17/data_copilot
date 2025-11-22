@@ -43,17 +43,27 @@ The user's intent has been clarified. Use the enriched query and assumptions to 
   
   ${enrichedContext}
   
-  Rules:
+  CRITICAL RULES:
   1. Generate ONLY the SQL query. Do not include markdown formatting like \`\`\`sql.
   2. Use only SELECT statements.
-  3. If the user asks for something not in the schema, return "ERROR: I cannot answer that with the available data."
-  4. Always limit results to the specified limit or 100 rows unless specified otherwise.
-  5. Use standard PostgreSQL syntax.
-  6. Apply filters based on the assumptions provided (e.g., exclude discontinued products, filter by time period).
-  7. Use appropriate aggregations (SUM, COUNT, AVG) based on the metric assumption.
-  8. ORDER BY the specified metric in DESC or ASC as indicated.
-  9. Include JOINs when necessary to get related data from multiple tables.
-  10. Use proper column aliases for clarity.
+  3. **NEVER invent or assume columns that don't exist in the schema above.**
+  4. **If the user asks for columns like 'department', 'debt', 'ratio', or any financial metric not explicitly in the schema, return: "ERROR: I cannot answer that with the available data."**
+  5. **Use ONLY PostgreSQL syntax:**
+     - For dates: DATE_TRUNC('month', column), EXTRACT(YEAR FROM column), column::date
+     - NEVER use generic functions like date(column, interval) or non-PostgreSQL syntax
+  6. **CRITICAL TIME FILTER:**
+     - This is a Northwind database with data from 1996-1998
+     - NEVER use CURRENT_DATE, NOW(), or 'current year'
+     - For "current year" requests, use: WHERE EXTRACT(YEAR FROM order_date) = 1997
+     - For "last 12 months", use: WHERE order_date >= '1997-01-01' AND order_date < '1998-01-01'
+     - Default to ALL TIME (no date filter) unless specifically asked
+  7. Always limit results to the specified limit or 100 rows unless specified otherwise.
+  8. Apply filters based on the assumptions provided (e.g., exclude discontinued products, filter by time period).
+  9. Use appropriate aggregations (SUM, COUNT, AVG) based on the metric assumption.
+  10. ORDER BY the specified metric in DESC or ASC as indicated.
+  11. Include JOINs when necessary to get related data from multiple tables.
+  12. Use proper column aliases for clarity.
+  13. **Before generating SQL, verify that ALL columns you plan to use exist in the schema above.**
   `;
 
   const response = await model.invoke([
@@ -62,6 +72,8 @@ The user's intent has been clarified. Use the enriched query and assumptions to 
   ]);
 
   const sqlQuery = response.content.toString().trim().replace(/```sql/g, "").replace(/```/g, "").trim();
+
+  console.log(`  📝 SQL Generated: ${sqlQuery}`);
 
   return {
     sqlQuery,

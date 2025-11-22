@@ -122,7 +122,9 @@ IMPORTANT:
 - Use the database schema to understand available dimensions
 - Make REASONABLE assumptions based on common BI practices
 - For "top N" queries without specified metric, default to revenue
-- For time-based queries without period, default to "current year" or "last 12 months"
+- **CRITICAL: This is a Northwind database with historical data from 1996-1998**
+- For time-based queries without period, default to "all time" or "year 1997"
+- NEVER assume "current year" - use "all time" or specific years (1996, 1997, 1998)
 - Always consider business rules (exclude discontinued, active only, etc.)
 `;
 
@@ -141,6 +143,7 @@ IMPORTANT:
 
     // Actualizar la query natural con la versión enriquecida
     return {
+      messages: [response],
       naturalQuery: result.enrichedQuery || state.naturalQuery,
       queryIntent: {
         isAmbiguous: result.isAmbiguous,
@@ -154,7 +157,17 @@ IMPORTANT:
     };
   } catch (error) {
     console.error("Error parsing intent clarifier response:", error);
-    // Si falla, continuar con la query original
-    return {};
+    console.error("Response content:", response.content.toString());
+    // Si falla, continuar con la query original pero incluir messages
+    return {
+      messages: [response],
+      queryIntent: {
+        isAmbiguous: false,
+        originalQuery: state.naturalQuery,
+        enrichedQuery: state.naturalQuery,
+        assumptions: {},
+        contextEnrichment: "No additional context"
+      }
+    };
   }
 };

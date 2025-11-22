@@ -28,8 +28,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, sidebarContent }) => {
           </button>
           
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-medium text-text-secondary px-3 py-2">Hoy</div>
-            <div className="text-xs text-text-secondary px-3">Historial próximamente...</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-gray-300 px-3 py-2">Hoy</div>
+            <div className="text-xs text-gray-400 px-3">Historial próximamente...</div>
           </div>
         </div>
 
