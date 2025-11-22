@@ -6,6 +6,7 @@ import { visualizerNode } from "./nodes/visualizer";
 import { dashboardOrchestratorNode } from "./nodes/dashboard-orchestrator";
 import { dashboardBuilderNode } from "./nodes/dashboard-builder";
 import { intentClarifierNode } from "./nodes/intent-clarifier";
+import { contextValidatorNode } from "./nodes/context-validator";
 
 // Definir el grafo de estado
 const workflow = new StateGraph<AgentState>({
@@ -50,13 +51,25 @@ const workflow = new StateGraph<AgentState>({
     },
   },
 })
+  .addNode("contextValidator", contextValidatorNode)
   .addNode("intentClarifier", intentClarifierNode)
   .addNode("orchestrator", dashboardOrchestratorNode)
   .addNode("translator", translatorNode)
   .addNode("executor", executorNode)
   .addNode("visualizer", visualizerNode)
   .addNode("dashboardBuilder", dashboardBuilderNode)
-  .addEdge(START, "intentClarifier")
+  .addEdge(START, "contextValidator")
+  .addConditionalEdges(
+    "contextValidator",
+    (state: AgentState) => {
+      // Si hay error, terminar (query fuera de contexto)
+      return state.error ? "end" : "intentClarifier";
+    },
+    {
+      end: END,
+      intentClarifier: "intentClarifier",
+    }
+  )
   .addEdge("intentClarifier", "orchestrator")
   .addConditionalEdges(
     "orchestrator",
