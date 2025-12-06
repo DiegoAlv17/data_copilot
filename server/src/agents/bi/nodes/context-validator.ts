@@ -18,7 +18,7 @@ export const contextValidatorNode = async (state: AgentState) => {
 
   console.log(`🔍 Validating context for: "${state.naturalQuery}"`);
 
-  const systemPrompt = `Eres un Validador de Contexto para un Sistema de Inteligencia de Negocios.
+  const systemPrompt = `Eres un Validador de Contexto ESTRICTO para un Sistema de Inteligencia de Negocios.
 
 Tu ÚNICA tarea es determinar si la pregunta del usuario es RELEVANTE para una base de datos de negocios o si está FUERA DE CONTEXTO.
 
@@ -26,61 +26,68 @@ Contexto de la Base de Datos:
 - Esta es una base de datos Northwind (pedidos, clientes, productos, empleados, proveedores, categorías)
 - Contiene datos de negocio: ventas, pedidos, productos, clientes, empleados, envíos
 - Tiene datos históricos de 1996-1998
+- NO contiene datos de deportes, fútbol, mundiales, equipos deportivos, ni eventos actuales
 
 Consulta del Usuario: "${state.naturalQuery}"
 
 REGLAS PARA CONSULTAS VÁLIDAS (EN CONTEXTO):
-✅ Preguntas sobre ventas, ingresos, pedidos, productos, clientes
+✅ Preguntas sobre ventas, ingresos, pedidos, productos, clientes de la base de datos
 ✅ Métricas de negocio y KPIs (totales, promedios, tendencias)
-✅ Datos de empleados, clientes, productos
-✅ Análisis regional, desglose por categorías
-✅ Tendencias temporales (mensual, anual)
-✅ Top performers, rankings, comparaciones
+✅ Datos de empleados, clientes, productos de Northwind
+✅ Análisis regional, desglose por categorías de productos
+✅ Tendencias temporales de ventas (mensual, anual)
+✅ Top performers, rankings de productos/clientes/empleados
 ✅ Saludos ("hola", "gracias", "buenos días") - son interacciones sociales válidas
 
-REGLAS PARA CONSULTAS INVÁLIDAS (FUERA DE CONTEXTO):
-❌ Preguntas de conocimiento general (historia, geografía, ciencia, cultura, deportes)
-❌ Cálculos matemáticos no relacionados con la base de datos (ej: "cuánto es 5+5?")
-❌ Eventos actuales, noticias, clima, deportes actuales
+REGLAS PARA CONSULTAS INVÁLIDAS (FUERA DE CONTEXTO) - RECHAZAR INMEDIATAMENTE:
+❌ DEPORTES: fútbol, mundiales, copas, equipos, jugadores, partidos, Argentina/Brasil/etc en contexto deportivo
+❌ Preguntas de conocimiento general (historia, geografía, ciencia, cultura)
+❌ Cálculos matemáticos no relacionados con la base de datos
+❌ Eventos actuales, noticias, clima
+❌ Cualquier cosa sobre el Mundial 2026, Copa América, Champions League, etc.
 ❌ Consejos personales, recomendaciones
-❌ Preguntas sobre temas completamente no relacionados con datos de negocio
-❌ Preguntas técnicas sobre programación, IA, etc. (a menos que sea sobre este sistema)
+❌ Preguntas sobre temas no relacionados con datos de negocio/ventas
 
-EJEMPLOS:
+EJEMPLOS DE RECHAZO INMEDIATO:
 
-"¿Quién descubrió América?" → FUERA_DE_CONTEXTO (pregunta de historia)
+"¿Cuál es el grupo de Argentina en el mundial 2026?" → FUERA_DE_CONTEXTO (deportes)
+"¿Quién ganó la Champions League?" → FUERA_DE_CONTEXTO (deportes)
+"¿Quién descubrió América?" → FUERA_DE_CONTEXTO (historia)
 "¿Cuál es la capital de Francia?" → FUERA_DE_CONTEXTO (geografía)
 "¿Cómo hago un pastel?" → FUERA_DE_CONTEXTO (cocina)
-"¿Cuál es el grupo de Argentina en el mundial?" → FUERA_DE_CONTEXTO (deportes)
-"Explica la física cuántica" → FUERA_DE_CONTEXTO (ciencia)
 
-"Top 5 productos por ventas" → EN_CONTEXTO (consulta de negocio)
-"Muéstrame los ingresos por región" → EN_CONTEXTO (consulta de negocio)
-"¿Qué empleado tiene más pedidos?" → EN_CONTEXTO (consulta de negocio)
-"Hola" → EN_CONTEXTO (saludo)
-"Gracias" → EN_CONTEXTO (interacción social)
-"¿Qué datos tienes?" → EN_CONTEXTO (pregunta sobre el sistema)
+EJEMPLOS VÁLIDOS:
 
-FORMATO DE SALIDA (solo JSON):
-{
-  "isValid": true/false,
-  "reason": "Breve explicación de por qué es o no es relevante para la base de datos"
-}
+"Top 5 productos por ventas" → EN_CONTEXTO
+"Muéstrame los ingresos por región" → EN_CONTEXTO
+"¿Qué empleado tiene más pedidos?" → EN_CONTEXTO
+"Hola" → EN_CONTEXTO
+"Gracias" → EN_CONTEXTO
 
-IMPORTANTE: Sé generoso con saludos, interacciones sociales y preguntas relacionadas con el sistema. Solo rechaza preguntas que sean CLARAMENTE no relacionadas con datos de negocio.
+FORMATO DE SALIDA (SOLO JSON, sin explicación adicional):
+{"isValid": false, "reason": "Pregunta sobre deportes/mundial, fuera del contexto de datos de negocio"}
+
+o
+
+{"isValid": true, "reason": "Consulta válida sobre datos de negocio"}
 `;
 
   const response = await model.invoke([
     new SystemMessage(systemPrompt),
-    new HumanMessage("Valida esta consulta."),
+    new HumanMessage("Valida esta consulta y responde SOLO con JSON."),
   ]);
 
   try {
-    const content = response.content.toString().replace(/```json/g, "").replace(/```/g, "").trim();
+    const rawContent = response.content.toString();
+    console.log(`   📋 Raw validator response: ${rawContent.substring(0, 200)}`);
+    
+    const content = rawContent.replace(/```json/g, "").replace(/```/g, "").trim();
     const result = JSON.parse(content);
 
+    console.log(`   🔍 Parsed result: isValid=${result.isValid}, reason=${result.reason}`);
+
     if (!result.isValid) {
-      console.log(`   ❌ Query rejected: ${result.reason}`);
+      console.log(`   ❌ Query REJECTED - Out of context: ${result.reason}`);
       
       // Crear un mensaje amigable en español para el usuario
       const friendlyMessage = `Lo siento, esa pregunta está fuera de mi área de conocimiento. 
@@ -105,13 +112,29 @@ Por ejemplo, puedes preguntarme:
       };
     }
 
-    console.log(`   ✅ Query is valid: ${result.reason}`);
+    console.log(`   ✅ Query APPROVED: ${result.reason}`);
     return {
       messages: [response]
     };
-  } catch (error) {
-    console.error("   ⚠️ Error parsing context validation, allowing query to continue:", error);
-    // Si falla el parser, permitimos que continúe (fail-safe)
+  } catch (parseError) {
+    console.error("   ⚠️ Error parsing context validation response:", parseError);
+    console.error("   ⚠️ Raw response was:", response.content.toString());
+    
+    // Si falla el parser, verificar manualmente si parece fuera de contexto
+    const rawLower = response.content.toString().toLowerCase();
+    if (rawLower.includes('"isvalid": false') || rawLower.includes('"isvalid":false') || 
+        rawLower.includes('fuera_de_contexto') || rawLower.includes('out_of_context')) {
+      console.log(`   ❌ Query REJECTED (detected from raw response)`);
+      const friendlyMessage = `Lo siento, esa pregunta está fuera de mi área de conocimiento. Solo puedo ayudarte con consultas sobre ventas, productos, clientes y empleados de nuestra base de datos de negocio.`;
+      return {
+        messages: [new AIMessage(friendlyMessage)],
+        error: friendlyMessage,
+        queryResult: []
+      };
+    }
+    
+    // Si no podemos determinar, permitimos continuar (fail-safe)
+    console.log(`   ⚠️ Could not parse, allowing query to continue`);
     return {
       messages: [response]
     };
