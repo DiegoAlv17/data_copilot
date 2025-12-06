@@ -139,8 +139,21 @@ wsServer.on('connection', (ws: WebSocket) => {
 
                     const lastMessage = result.messages[result.messages.length - 1];
                     
+                    // Si hay un error de contexto (pregunta fuera de lugar), enviar como resultado con el mensaje amigable
+                    if (result.error && (!result.queryResult || result.queryResult.length === 0)) {
+                        ws.send(JSON.stringify({
+                            type: 'result',
+                            text: result.error,
+                            chartData: [],
+                            chartType: null,
+                            sql: null,
+                            chartConfig: null,
+                            queryIntent: null,
+                            error: null
+                        }));
+                    }
                     // Verificar si es un dashboard o una visualización simple
-                    if (result.isDashboard && result.dashboardWidgets) {
+                    else if (result.isDashboard && result.dashboardWidgets) {
                         ws.send(JSON.stringify({
                             type: 'dashboard',
                             text: lastMessage.content,

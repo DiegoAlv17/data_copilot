@@ -1,6 +1,6 @@
 import { AgentState } from "../state";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { HumanMessage, SystemMessage, AIMessage } from "@langchain/core/messages";
 
 /**
  * Context Validator Node
@@ -18,62 +18,61 @@ export const contextValidatorNode = async (state: AgentState) => {
 
   console.log(`🔍 Validating context for: "${state.naturalQuery}"`);
 
-  const systemPrompt = `You are a Context Validator for a Business Intelligence Database System.
+  const systemPrompt = `Eres un Validador de Contexto para un Sistema de Inteligencia de Negocios.
 
-Your ONLY job is to determine if a user's question is RELEVANT to a business database or if it's OUT OF CONTEXT.
+Tu ÚNICA tarea es determinar si la pregunta del usuario es RELEVANTE para una base de datos de negocios o si está FUERA DE CONTEXTO.
 
-Database Context:
-- This is a Northwind database (orders, customers, products, employees, suppliers, categories)
-- It contains business data: sales, orders, products, customers, employees, shipping
-- It has historical data from 1996-1998
+Contexto de la Base de Datos:
+- Esta es una base de datos Northwind (pedidos, clientes, productos, empleados, proveedores, categorías)
+- Contiene datos de negocio: ventas, pedidos, productos, clientes, empleados, envíos
+- Tiene datos históricos de 1996-1998
 
-User Query: "${state.naturalQuery}"
+Consulta del Usuario: "${state.naturalQuery}"
 
-RULES FOR IN-CONTEXT (VALID) queries:
-✅ Questions about sales, revenue, orders, products, customers
-✅ Business metrics and KPIs (totals, averages, trends)
-✅ Employee data, customer data, product data
-✅ Regional analysis, category breakdowns
-✅ Time-based trends (monthly, yearly)
-✅ Top performers, rankings, comparisons
-✅ Greetings ("hello", "hi", "thanks") - these are valid social interactions
+REGLAS PARA CONSULTAS VÁLIDAS (EN CONTEXTO):
+✅ Preguntas sobre ventas, ingresos, pedidos, productos, clientes
+✅ Métricas de negocio y KPIs (totales, promedios, tendencias)
+✅ Datos de empleados, clientes, productos
+✅ Análisis regional, desglose por categorías
+✅ Tendencias temporales (mensual, anual)
+✅ Top performers, rankings, comparaciones
+✅ Saludos ("hola", "gracias", "buenos días") - son interacciones sociales válidas
 
-RULES FOR OUT-OF-CONTEXT (INVALID) queries:
-❌ General knowledge questions (history, geography, science, culture)
-❌ Math calculations not related to database (e.g., "what's 5+5?")
-❌ Current events, news, weather
-❌ Personal advice, recommendations
-❌ Questions about topics completely unrelated to business data
-❌ Technical questions about programming, AI, etc. (unless about this system)
+REGLAS PARA CONSULTAS INVÁLIDAS (FUERA DE CONTEXTO):
+❌ Preguntas de conocimiento general (historia, geografía, ciencia, cultura, deportes)
+❌ Cálculos matemáticos no relacionados con la base de datos (ej: "cuánto es 5+5?")
+❌ Eventos actuales, noticias, clima, deportes actuales
+❌ Consejos personales, recomendaciones
+❌ Preguntas sobre temas completamente no relacionados con datos de negocio
+❌ Preguntas técnicas sobre programación, IA, etc. (a menos que sea sobre este sistema)
 
-EXAMPLES:
+EJEMPLOS:
 
-"¿Quién descubrió América?" → OUT_OF_CONTEXT (history question)
-"What is the capital of France?" → OUT_OF_CONTEXT (geography)
-"How do I bake a cake?" → OUT_OF_CONTEXT (cooking)
-"What's the weather today?" → OUT_OF_CONTEXT (current events)
-"Explain quantum physics" → OUT_OF_CONTEXT (science)
+"¿Quién descubrió América?" → FUERA_DE_CONTEXTO (pregunta de historia)
+"¿Cuál es la capital de Francia?" → FUERA_DE_CONTEXTO (geografía)
+"¿Cómo hago un pastel?" → FUERA_DE_CONTEXTO (cocina)
+"¿Cuál es el grupo de Argentina en el mundial?" → FUERA_DE_CONTEXTO (deportes)
+"Explica la física cuántica" → FUERA_DE_CONTEXTO (ciencia)
 
-"Top 5 products by sales" → IN_CONTEXT (business query)
-"Show me revenue by region" → IN_CONTEXT (business query)
-"Which employee has the most orders?" → IN_CONTEXT (business query)
-"Hello" → IN_CONTEXT (greeting)
-"Thank you" → IN_CONTEXT (social interaction)
-"What data do you have?" → IN_CONTEXT (system question)
+"Top 5 productos por ventas" → EN_CONTEXTO (consulta de negocio)
+"Muéstrame los ingresos por región" → EN_CONTEXTO (consulta de negocio)
+"¿Qué empleado tiene más pedidos?" → EN_CONTEXTO (consulta de negocio)
+"Hola" → EN_CONTEXTO (saludo)
+"Gracias" → EN_CONTEXTO (interacción social)
+"¿Qué datos tienes?" → EN_CONTEXTO (pregunta sobre el sistema)
 
-OUTPUT FORMAT (JSON only):
+FORMATO DE SALIDA (solo JSON):
 {
   "isValid": true/false,
-  "reason": "Brief explanation why this is or isn't relevant to the database",
-  "suggestedResponse": "If invalid, a friendly message to user explaining what the system can help with"
+  "reason": "Breve explicación de por qué es o no es relevante para la base de datos"
 }
 
-IMPORTANT: Be generous with greetings, social interactions, and system-related questions. Only reject questions that are CLEARLY unrelated to business data.
+IMPORTANTE: Sé generoso con saludos, interacciones sociales y preguntas relacionadas con el sistema. Solo rechaza preguntas que sean CLARAMENTE no relacionadas con datos de negocio.
 `;
 
   const response = await model.invoke([
     new SystemMessage(systemPrompt),
-    new HumanMessage("Validate this query."),
+    new HumanMessage("Valida esta consulta."),
   ]);
 
   try {
@@ -82,9 +81,26 @@ IMPORTANT: Be generous with greetings, social interactions, and system-related q
 
     if (!result.isValid) {
       console.log(`   ❌ Query rejected: ${result.reason}`);
+      
+      // Crear un mensaje amigable en español para el usuario
+      const friendlyMessage = `Lo siento, esa pregunta está fuera de mi área de conocimiento. 
+
+Soy un asistente especializado en análisis de datos de negocio. Puedo ayudarte con consultas sobre:
+
+📊 **Ventas y pedidos** - Tendencias, totales, comparaciones
+👥 **Clientes** - Análisis por región, comportamiento de compra
+📦 **Productos** - Rankings, categorías, inventario
+👨‍💼 **Empleados** - Rendimiento, productividad
+🚚 **Envíos** - Tiempos, costos, proveedores
+
+Por ejemplo, puedes preguntarme:
+• "¿Cuáles son los 5 productos más vendidos?"
+• "Muéstrame las ventas por mes"
+• "¿Qué clientes han gastado más?"`;
+
       return {
-        messages: [response],
-        error: result.suggestedResponse || "Lo siento, solo puedo ayudarte con consultas sobre la base de datos de ventas, productos, clientes y empleados.",
+        messages: [new AIMessage(friendlyMessage)],
+        error: friendlyMessage,
         queryResult: []
       };
     }
