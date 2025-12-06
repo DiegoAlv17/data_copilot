@@ -424,6 +424,45 @@ Las contribuciones son bienvenidas. Por favor:### ✅ **MCP Real**
 - Código fuente completamente documentado
 - Ejemplos de uso en cada módulo
 
+## 🚀 Despliegue en Producción (Render)
+
+### Opción 1: Usando render.yaml (recomendado)
+
+1. Sube tu código a GitHub
+2. En [Render Dashboard](https://dashboard.render.com/), crea un nuevo "Blueprint"
+3. Conecta tu repositorio de GitHub
+4. Render detectará automáticamente el archivo `render.yaml`
+
+### Opción 2: Configuración manual
+
+1. Crea un nuevo **Web Service** en Render
+2. Conecta tu repositorio de GitHub
+3. Configura:
+   - **Build Command**: `npm run render:build`
+   - **Start Command**: `npm start`
+4. Agrega las **Variables de Entorno**:
+   - `NODE_ENV` = `production`
+   - `DATABASE_URL` = Tu URL de PostgreSQL
+   - `GOOGLE_API_KEY` = Tu API key de Gemini
+   
+### Variables de Entorno Requeridas
+
+| Variable | Descripción |
+|----------|-------------|
+| `NODE_ENV` | `production` para despliegue |
+| `DATABASE_URL` | URL de conexión PostgreSQL (ej: `postgresql://user:pass@host:5432/db`) |
+| `GOOGLE_API_KEY` | API Key de Google AI Studio para Gemini |
+| `PORT` | (Opcional) Puerto del servidor, Render lo asigna automáticamente |
+
+### Base de Datos
+
+Puedes usar:
+- **Render PostgreSQL**: Crea una base de datos PostgreSQL en Render
+- **Supabase**: Servicio gratuito de PostgreSQL
+- **Neon**: PostgreSQL serverless
+
+Asegúrate de importar los datos de Northwind en tu base de datos.
+
 ---
 *🔗 Dashboard MCP Analytics - Lenguaje Natural → SQL → Gráficos*
 *Compatible con protocolo Claude Desktop • Powered by Gemini AI • Chart.js*

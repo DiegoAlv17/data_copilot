@@ -20,10 +20,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<any>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connect = () => {
-    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3004';
+    // En producción, usar el mismo host; en desarrollo, usar la URL configurada
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = import.meta.env.PROD 
+      ? `${wsProtocol}//${window.location.host}` 
+      : (import.meta.env.VITE_WS_URL || 'ws://localhost:3002');
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {

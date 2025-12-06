@@ -54,17 +54,17 @@ export const PieChart: React.FC<PieChartProps> = ({ data, config }) => {
 
     slices.append('path')
       .attr('d', arc)
-      .attr('fill', (d, i) => color(i.toString()))
+      .attr('fill', (_d, i) => color(i.toString()))
       .attr('stroke', '#1f2937')
       .attr('stroke-width', 2)
       .style('opacity', 0)
-      .on('mouseenter', function(event, d) {
+      .on('mouseenter', function() {
         d3.select(this)
           .transition()
           .duration(200)
           .attr('d', arcHover);
       })
-      .on('mouseleave', function(event, d) {
+      .on('mouseleave', function() {
         d3.select(this)
           .transition()
           .duration(200)
@@ -102,12 +102,12 @@ export const PieChart: React.FC<PieChartProps> = ({ data, config }) => {
       .data(data)
       .join('g')
       .attr('class', 'legend')
-      .attr('transform', (d, i) => `translate(${radius + 20}, ${-radius + i * 25})`);
+      .attr('transform', (_d, i) => `translate(${radius + 20}, ${-radius + i * 25})`);
 
     legend.append('rect')
       .attr('width', 18)
       .attr('height', 18)
-      .attr('fill', (d, i) => color(i.toString()))
+      .attr('fill', (_d, i) => color(i.toString()))
       .attr('rx', 3);
 
     legend.append('text')

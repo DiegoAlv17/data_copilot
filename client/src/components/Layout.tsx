@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Menu, X, MessageSquare, BarChart2, Settings, Activity } from 'lucide-react';
+import { useState } from 'react';
+import { Menu, MessageSquare, Settings } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
-  sidebarContent: React.ReactNode;
+  sidebarContent?: React.ReactNode;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, sidebarContent }) => {
+export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (

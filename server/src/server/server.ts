@@ -6,14 +6,14 @@ import http from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
 import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
+import fs from 'fs';
 import { biAgent } from '../agents/bi/graph';
 import { HumanMessage } from "@langchain/core/messages";
 import { AgentState } from '../agents/bi/state';
 
-
-
 // Configuración
 const PORT = process.env.PORT || 3002;
+const isProduction = process.env.NODE_ENV === 'production';
 
 const app = express();
 const server = http.createServer(app);
@@ -21,30 +21,46 @@ const server = http.createServer(app);
 // Variables globales
 let mcpProcess: ChildProcess | null = null;
 
-console.log('🚀 Iniciando MCP Analytics Server...');
+// Ruta al frontend compilado (relativa desde dist/server/)
+const clientDistPath = path.join(__dirname, '../../../client/dist');
 
-// Servir archivos estáticos desde public
-app.use(express.static(path.join(__dirname, '../../public')));
+console.log(`🚀 Iniciando MCP Analytics Server en modo ${isProduction ? 'PRODUCCIÓN' : 'DESARROLLO'}...`);
+
+// En producción, servir el frontend compilado
+if (isProduction) {
+  if (fs.existsSync(clientDistPath)) {
+    console.log(`📁 Sirviendo archivos estáticos desde: ${clientDistPath}`);
+    app.use(express.static(clientDistPath));
+  } else {
+    console.warn(`⚠️ No se encontró el directorio del frontend: ${clientDistPath}`);
+    console.warn(`⚠️ Ejecuta 'npm run build' en el directorio client primero`);
+  }
+} else {
+  // En desarrollo, servir archivos estáticos desde public (legacy)
+  app.use(express.static(path.join(__dirname, '../../public')));
+}
+
 app.use(express.json());
 
-// Rutas principales
-app.get('/', (req, res) => {
-    res.redirect('/index.html');
-});
-
-app.get('/mcp-status', (req, res) => {
+// Rutas API
+app.get('/api/status', (req, res) => {
     res.json({
         status: mcpProcess ? 'running' : 'stopped',
         mcpServer: mcpProcess ? 'connected' : 'disconnected',
         port: PORT,
+        environment: isProduction ? 'production' : 'development',
         endpoints: {
-            dashboard: '/',
-            status: '/mcp-status',
+            api: '/api/status',
             health: '/health',
             websocket: `ws://localhost:${PORT}`
         },
         timestamp: new Date().toISOString()
     });
+});
+
+// Legacy route for backwards compatibility
+app.get('/mcp-status', (req, res) => {
+    res.redirect('/api/status');
 });
 
 app.get('/health', (req, res) => {
@@ -88,6 +104,17 @@ app.post('/api/chat', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Ruta catch-all para SPA (React Router) - debe estar después de las rutas API
+if (isProduction && fs.existsSync(clientDistPath)) {
+  app.get('*', (req, res) => {
+    // No interceptar rutas de API o WebSocket
+    if (req.path.startsWith('/api/') || req.path.startsWith('/health') || req.path.startsWith('/mcp')) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 // WebSocket Server para MCP
 

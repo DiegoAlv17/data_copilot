@@ -1,4 +1,3 @@
-import React from 'react';
 import { Layout } from './components/Layout';
 import { SplitViewChat } from './components/SplitViewChat';
 import { WebSocketProvider } from './contexts/WebSocketContext';

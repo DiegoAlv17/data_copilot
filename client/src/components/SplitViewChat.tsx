@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, Bot, User } from 'lucide-react';
 import type { ChatMessage } from '../types';
 import { useWebSocket } from '../contexts/WebSocketContext';
-import { Message } from './Message';
 import { DashboardGrid } from './DashboardGrid';
 import { ChartRenderer } from './charts/ChartRenderer';
 
