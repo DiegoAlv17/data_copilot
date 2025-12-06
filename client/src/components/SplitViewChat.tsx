@@ -242,11 +242,15 @@ export const SplitViewChat: React.FC = () => {
                 widgets={lastVisualization.dashboardWidgets}
               />
             ) : lastVisualization.chartData && lastVisualization.chartType ? (
-              <ChartRenderer 
-                type={lastVisualization.chartType} 
-                data={lastVisualization.chartData} 
-                config={lastVisualization.chartConfig || {}}
-              />
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.15)] overflow-hidden min-h-[500px]">
+                <div className="overflow-x-auto p-4">
+                  <ChartRenderer 
+                    type={lastVisualization.chartType} 
+                    data={lastVisualization.chartData} 
+                    config={lastVisualization.chartConfig || {}}
+                  />
+                </div>
+              </div>
             ) : null}
           </div>
         </div>

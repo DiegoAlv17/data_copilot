@@ -36,6 +36,9 @@ export interface AgentState {
   error?: string;
   visualizationType?: 'bar' | 'line' | 'pie' | 'scatter' | 'table' | 'card';
   
+  // Suggested chart type from dashboard orchestrator
+  suggestedChartType?: string;
+  
   // Intent analysis
   queryIntent?: QueryIntent;
   

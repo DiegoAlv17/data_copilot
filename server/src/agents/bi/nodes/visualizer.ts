@@ -9,7 +9,7 @@ export const visualizerNode = async (state: AgentState) => {
 
   if (!state.queryResult || state.queryResult.length === 0) {
     return {
-      error: "No data found for your query.",
+      error: "No se encontraron datos para tu consulta.",
     };
   }
 
@@ -21,33 +21,50 @@ export const visualizerNode = async (state: AgentState) => {
     apiKey: apiKey
   });
 
-
-
   const dataSample = JSON.stringify(state.queryResult.slice(0, 5)); // Solo enviamos una muestra para no saturar el contexto
   const dataColumns = Object.keys(state.queryResult[0]).join(", ");
+  const dataRowCount = state.queryResult.length;
 
-  const systemPrompt = `You are a Data Visualization Expert using D3.js concepts.
-  Your goal is to decide the best visualization type and configuration for the provided data.
+  // Incluir el tipo sugerido si existe
+  const suggestedTypeHint = state.suggestedChartType 
+    ? `\n\nSUGGESTED CHART TYPE: "${state.suggestedChartType}" - Consider this suggestion strongly, especially for:
+       - 'card': Use when there's only 1 row of data with a single key metric
+       - 'table': Use when displaying rankings or multiple columns of data
+       - Only override if the data structure clearly doesn't match the suggestion.`
+    : '';
+
+  const systemPrompt = `Eres un Experto en Visualización de Datos usando conceptos de D3.js.
+  Tu objetivo es decidir el mejor tipo de visualización y configuración para los datos proporcionados.
   
-  User Query: "${state.naturalQuery}"
-  Data Columns: ${dataColumns}
-  Data Sample: ${dataSample}
+  **IMPORTANTE: El campo 'summary' DEBE estar en ESPAÑOL.**
   
-  Available Chart Types: 'bar', 'line', 'pie', 'scatter', 'table', 'card' (for single values).
+  Consulta del Usuario: "${state.naturalQuery}"
+  Columnas de Datos: ${dataColumns}
+  Cantidad de Filas: ${dataRowCount}
+  Muestra de Datos: ${dataSample}${suggestedTypeHint}
   
-  Task:
-  1. Determine the best 'visualizationType'.
-  2. Create a 'chartConfig' object that describes how to map the data to the chart.
-     - For 'bar'/'line': identify 'xKey' (categories/time) and 'yKey' (values).
-     - For 'pie': identify 'labelKey' and 'valueKey'.
-     - For 'card': identify the 'valueKey' and 'label'.
-     - For 'table': list 'columns' to show.
+  Tipos de Gráficos Disponibles: 'bar', 'line', 'pie', 'scatter', 'table', 'card' (para valores únicos).
   
-  Output JSON format ONLY:
+  REGLAS IMPORTANTES:
+  - Usar 'card' SOLO cuando hay exactamente 1 fila con un único valor agregado (ej: total, conteo, promedio)
+  - Usar 'table' para rankings, listas, o cuando se muestran múltiples columnas por fila
+  - Usar 'bar' para comparar categorías (ej: ventas por región, pedidos por empleado)
+  - Usar 'line' para series temporales o tendencias (datos con fechas/meses/años en el eje x)
+  - Usar 'pie' para mostrar proporciones de un total (limitado a 6-8 categorías máximo)
+  
+  Tarea:
+  1. Determinar el mejor 'visualizationType'.
+  2. Crear un objeto 'chartConfig' que describa cómo mapear los datos al gráfico.
+     - Para 'bar'/'line': identificar 'xKey' (categorías/tiempo) y 'yKey' (valores).
+     - Para 'pie': identificar 'labelKey' y 'valueKey'.
+     - Para 'card': identificar 'valueKey' y 'label'.
+     - Para 'table': listar 'columns' a mostrar.
+  
+  Formato de salida JSON SOLAMENTE:
   {
     "visualizationType": "...",
     "chartConfig": { ... },
-    "summary": "A brief 1-sentence summary of what this data shows."
+    "summary": "Un breve resumen de 1 oración en ESPAÑOL de lo que muestran estos datos."
   }
   `;
 
@@ -66,7 +83,7 @@ export const visualizerNode = async (state: AgentState) => {
       visualizationType: result.visualizationType,
       chartConfig: result.chartConfig,
       // Agregamos un mensaje final del asistente
-      messages: [new HumanMessage(result.summary || "Here is the visualization for your data.")],
+      messages: [new HumanMessage(result.summary || "Aquí está la visualización de tus datos.")],
     };
   } catch (error) {
     console.error("  ⚠️ Error parsing visualization config:", error);

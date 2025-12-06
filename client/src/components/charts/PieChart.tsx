@@ -114,7 +114,7 @@ export const PieChart: React.FC<PieChartProps> = ({ data, config }) => {
       .attr('x', 24)
       .attr('y', 9)
       .attr('dy', '.35em')
-      .style('fill', '#f3f4f6')
+      .style('fill', '#374151')
       .style('font-size', '13px')
       .text(d => `${d[config.labelKey]}: ${d[config.valueKey]}`);
 

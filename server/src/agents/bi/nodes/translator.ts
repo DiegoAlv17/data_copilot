@@ -64,6 +64,27 @@ The user's intent has been clarified. Use the enriched query and assumptions to 
   11. Include JOINs when necessary to get related data from multiple tables.
   12. Use proper column aliases for clarity.
   13. **Before generating SQL, verify that ALL columns you plan to use exist in the schema above.**
+  
+  **CRITICAL DATA PRESENTATION RULES (for user-friendly output):**
+  14. **ALWAYS use human-readable names instead of IDs:**
+      - For employees: SELECT e.first_name || ' ' || e.last_name AS employee_name (NOT employee_id)
+      - For customers: SELECT c.company_name AS customer (NOT customer_id)
+      - For products: SELECT p.product_name AS product (NOT product_id)
+      - For categories: SELECT cat.category_name AS category (NOT category_id)
+      - For suppliers: SELECT s.company_name AS supplier (NOT supplier_id)
+      - For shippers: SELECT sh.company_name AS shipper (NOT shipper_id)
+  15. **Format dates for readability:**
+      - Use TO_CHAR(date_column, 'YYYY-MM') AS month for monthly groupings
+      - Use TO_CHAR(date_column, 'YYYY-MM-DD') AS date for daily data
+      - Use TO_CHAR(date_column, 'Mon YYYY') AS period for display
+  16. **Use descriptive column aliases in Spanish when appropriate:**
+      - total_revenue → ingresos_totales
+      - order_count → cantidad_pedidos
+      - avg_value → valor_promedio
+  17. **Round numeric results appropriately:**
+      - Currency values: ROUND(value::numeric, 2)
+      - Percentages: ROUND(value::numeric, 1)
+  18. **Always JOIN to get names, not just IDs, when the result will be displayed to users.**
   `;
 
   const response = await model.invoke([

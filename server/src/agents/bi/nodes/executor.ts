@@ -5,7 +5,7 @@ export const executorNode = async (state: AgentState) => {
   if (!state.sqlQuery || state.sqlQuery.startsWith("ERROR:")) {
     console.error(`  ❌ Invalid SQL query: ${state.sqlQuery}`);
     return {
-      error: state.sqlQuery || "No SQL query generated",
+      error: state.sqlQuery || "No se generó consulta SQL",
     };
   }
 
@@ -15,7 +15,7 @@ export const executorNode = async (state: AgentState) => {
     
     if (resultJson.startsWith("Error")) {
         console.error(`  ❌ SQL Error: ${resultJson}`);
-        return { error: resultJson };
+        return { error: `Error en la consulta SQL: ${resultJson}` };
     }
 
     const queryResult = JSON.parse(resultJson);
@@ -27,7 +27,7 @@ export const executorNode = async (state: AgentState) => {
   } catch (error: any) {
     console.error(`  ❌ Execution failed: ${error.message}`);
     return {
-      error: `Execution failed: ${error.message}`,
+      error: `Error al ejecutar la consulta: ${error.message}`,
     };
   }
 };

@@ -235,37 +235,42 @@ function startMCPServer() {
 
 
 // Iniciar servidor HTTP
-server.listen(PORT, () => {
-    console.log('');
-    console.log('=== 📊 MCP Analytics Dashboard ===');
-    console.log('');
-    console.log(`🌐 Servidor ejecutándose en puerto ${PORT}`);
-    console.log(`📊 Dashboard Principal: http://localhost:${PORT}`);
-    console.log(`📈 Estado del servidor: http://localhost:${PORT}/mcp-status`);
-    console.log(`🔗 WebSocket endpoint: ws://localhost:${PORT}`);
-    console.log('');
-    console.log('⚡ Características del dashboard:');
-    console.log('   - Consultas conversacionales con Gemini AI');
-    console.log('   - Conversión automática NL → SQL');
-    console.log('   - Ejecución vía MCP real (no simulado)');
-    console.log('   - Gráficos interactivos con Chart.js');
-    console.log('   - Métricas automáticas');
-    console.log('   - Múltiples tipos de gráficos');
-    console.log('');
-    console.log('💡 Ejemplos de consultas:');
-    console.log('   "Hola" → Saludo conversacional');
-    console.log('   "Muestra los empleados por país"');
-    console.log('   "¿Cuáles son los productos más vendidos?"');
-    console.log('   "Ventas por categoría de producto"');
-    console.log('   "Evolución de pedidos por mes"');
-    console.log('');
-    console.log('✅ Servidor HTTP listo para conexiones');
-    
-    // Iniciar MCP Server después de que el HTTP esté listo
-    setTimeout(() => {
-        startMCPServer();
-    }, 1000);
-});
+if (require.main === module) {
+    server.listen(PORT, () => {
+        console.log('');
+        console.log('=== 📊 MCP Analytics Dashboard ===');
+        console.log('');
+        console.log(`🌐 Servidor ejecutándose en puerto ${PORT}`);
+        console.log(`📊 Dashboard Principal: http://localhost:${PORT}`);
+        console.log(`📈 Estado del servidor: http://localhost:${PORT}/mcp-status`);
+        console.log(`🔗 WebSocket endpoint: ws://localhost:${PORT}`);
+        console.log('');
+        console.log('⚡ Características del dashboard:');
+        console.log('   - Consultas conversacionales con Gemini AI');
+        console.log('   - Conversión automática NL → SQL');
+        console.log('   - Ejecución vía MCP real (no simulado)');
+        console.log('   - Gráficos interactivos con Chart.js');
+        console.log('   - Métricas automáticas');
+        console.log('   - Múltiples tipos de gráficos');
+        console.log('');
+        console.log('💡 Ejemplos de consultas:');
+        console.log('   "Hola" → Saludo conversacional');
+        console.log('   "Muestra los empleados por país"');
+        console.log('   "¿Cuáles son los productos más vendidos?"');
+        console.log('   "Ventas por categoría de producto"');
+        console.log('   "Evolución de pedidos por mes"');
+        console.log('');
+        console.log('✅ Servidor HTTP listo para conexiones');
+        
+        // Iniciar MCP Server después de que el HTTP esté listo
+        setTimeout(() => {
+            startMCPServer();
+        }, 1000);
+    });
+}
+
+export { app, server };
+
 
 // Manejo de cierre graceful
 process.on('SIGTERM', cleanup);
